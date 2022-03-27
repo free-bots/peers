@@ -26,7 +26,7 @@ public abstract class InviteServerTransactionState extends AbstractState {
 
     protected InviteServerTransaction inviteServerTransaction;
     
-    public InviteServerTransactionState(String id,
+    protected InviteServerTransactionState(String id,
             InviteServerTransaction inviteServerTransaction, Logger logger) {
         super(id, logger);
         this.inviteServerTransaction = inviteServerTransaction;

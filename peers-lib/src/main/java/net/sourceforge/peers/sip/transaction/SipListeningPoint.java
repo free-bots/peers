@@ -20,34 +20,37 @@
 package net.sourceforge.peers.sip.transaction;
 
 
+import java.util.Objects;
+
 public class SipListeningPoint {
 
-    private int localPort;
-    private String localTransport;
-    
+    private final int localPort;
+    private final String localTransport;
+
     public SipListeningPoint(int localPort, String localTransport) {
         super();
         this.localPort = localPort;
         this.localTransport = localTransport;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
+        if (Objects.isNull(obj)) {
+            return false;
+        }
         if (obj.getClass() != SipListeningPoint.class) {
             return false;
         }
-        SipListeningPoint other = (SipListeningPoint)obj;
+        SipListeningPoint other = (SipListeningPoint) obj;
         return localPort == other.localPort &&
                 localTransport.equals(other.localTransport);
     }
-    
+
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(':').append(localPort).append('/').append(localTransport);
-        return buf.toString();
+        return ":" + localPort + '/' + localTransport;
     }
-    
+
     @Override
     public int hashCode() {
         return toString().hashCode();

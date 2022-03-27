@@ -59,10 +59,8 @@ public abstract class Transaction {
     }
 
     protected String getId() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(branchId).append(ID_SEPARATOR);
-        buf.append(method);
-        return buf.toString();
+        return branchId + ID_SEPARATOR +
+                method;
     }
 
     public SipResponse getLastResponse() {

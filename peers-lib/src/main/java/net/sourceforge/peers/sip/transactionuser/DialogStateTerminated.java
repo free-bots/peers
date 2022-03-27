@@ -29,22 +29,19 @@ public class DialogStateTerminated extends DialogState {
 
     @Override
     public void receivedOrSent101To199() {
-        logger.error(id + " invalid transition");
-        throw new IllegalStateException();
+        throwIllegalStateException();
     }
-    
+
     @Override
     public void receivedOrSent2xx() {
-        logger.error(id + " invalid transition");
-        throw new IllegalStateException();
+        throwIllegalStateException();
     }
-    
+
     @Override
     public void receivedOrSent300To699() {
-        logger.error(id + " invalid transition");
-        throw new IllegalStateException();
+        throwIllegalStateException();
     }
-    
+
     @Override
     public void receivedOrSentBye() {
         //ignore bye retransmissions

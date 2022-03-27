@@ -167,5 +167,7 @@ public final class RFC3261 {
     
     public static final String CONTENT_TYPE_SDP = "application/sdp";
     public static final int DEFAULT_EXPIRES = 3600;
-    
+
+    private RFC3261() {
+    }
 }

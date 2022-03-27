@@ -88,7 +88,7 @@ public class FileReader implements SoundSource {
         if (fileInputStream == null) {
             return null;
         }
-        byte buffer[] = new byte[BUFFER_SIZE];
+        byte[] buffer = new byte[BUFFER_SIZE];
         try {
             int read;
             if ((read = fileInputStream.read(buffer)) >= 0) {

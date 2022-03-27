@@ -28,5 +28,5 @@ public interface ServerTransaction {
     
     public void receivedRequest(SipRequest sipRequest);
     
-    public void sendReponse(SipResponse sipResponse);
+    public void sendResponse(SipResponse sipResponse);
 }

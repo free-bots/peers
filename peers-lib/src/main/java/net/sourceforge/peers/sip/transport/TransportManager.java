@@ -19,40 +19,20 @@
 
 package net.sourceforge.peers.sip.transport;
 
-import static net.sourceforge.peers.sip.RFC3261.DEFAULT_SIP_VERSION;
-import static net.sourceforge.peers.sip.RFC3261.IPV4_TTL;
-import static net.sourceforge.peers.sip.RFC3261.PARAM_MADDR;
-import static net.sourceforge.peers.sip.RFC3261.PARAM_TTL;
-import static net.sourceforge.peers.sip.RFC3261.TRANSPORT_DEFAULT_PORT;
-import static net.sourceforge.peers.sip.RFC3261.TRANSPORT_PORT_SEP;
-import static net.sourceforge.peers.sip.RFC3261.TRANSPORT_SCTP;
-import static net.sourceforge.peers.sip.RFC3261.TRANSPORT_TCP;
-import static net.sourceforge.peers.sip.RFC3261.TRANSPORT_TLS_PORT;
-import static net.sourceforge.peers.sip.RFC3261.TRANSPORT_UDP;
-import static net.sourceforge.peers.sip.RFC3261.TRANSPORT_UDP_USUAL_MAX_SIZE;
-import static net.sourceforge.peers.sip.RFC3261.TRANSPORT_VIA_SEP;
-import static net.sourceforge.peers.sip.RFC3261.TRANSPORT_VIA_SEP2;
-
-import java.io.IOException;
-import java.net.DatagramSocket;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Hashtable;
-
 import net.sourceforge.peers.Config;
 import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.Utils;
-import net.sourceforge.peers.sip.syntaxencoding.SipHeaderFieldName;
-import net.sourceforge.peers.sip.syntaxencoding.SipHeaderFieldValue;
-import net.sourceforge.peers.sip.syntaxencoding.SipHeaderParamName;
-import net.sourceforge.peers.sip.syntaxencoding.SipHeaders;
-import net.sourceforge.peers.sip.syntaxencoding.SipParser;
+import net.sourceforge.peers.sip.syntaxencoding.*;
 import net.sourceforge.peers.sip.transaction.TransactionManager;
+
+import java.io.IOException;
+import java.net.*;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Hashtable;
+
+import static net.sourceforge.peers.sip.RFC3261.*;
 
 
 public class TransportManager {
@@ -60,17 +40,17 @@ public class TransportManager {
     public static final int SOCKET_TIMEOUT = RFC3261.TIMER_T1;
 
     private static int NO_TTL = -1;
-    
+
     private Logger logger;
 
     //private UAS uas;
     private SipServerTransportUser sipServerTransportUser;
-    
+
     protected SipParser sipParser;
-    
-    private Hashtable<SipTransportConnection, DatagramSocket> datagramSockets;
-    private Hashtable<SipTransportConnection, MessageSender> messageSenders;
-    private Hashtable<SipTransportConnection, MessageReceiver> messageReceivers;
+
+    private final Hashtable<SipTransportConnection, DatagramSocket> datagramSockets;
+    private final Hashtable<SipTransportConnection, MessageSender> messageSenders;
+    private final Hashtable<SipTransportConnection, MessageReceiver> messageReceivers;
 
     private TransactionManager transactionManager;
 
@@ -78,36 +58,36 @@ public class TransportManager {
     private int sipPort;
 
     public TransportManager(TransactionManager transactionManager,
-            Config config, Logger logger) {
+                            Config config, Logger logger) {
         sipParser = new SipParser();
-        datagramSockets = new Hashtable<SipTransportConnection, DatagramSocket>();
-        messageSenders = new Hashtable<SipTransportConnection, MessageSender>();
-        messageReceivers = new Hashtable<SipTransportConnection, MessageReceiver>();
+        datagramSockets = new Hashtable<>();
+        messageSenders = new Hashtable<>();
+        messageReceivers = new Hashtable<>();
         this.transactionManager = transactionManager;
         this.config = config;
         this.logger = logger;
     }
-    
+
     public MessageSender createClientTransport(SipRequest sipRequest,
-            InetAddress inetAddress, int port, String transport)
-                throws IOException {
+                                               InetAddress inetAddress, int port, String transport)
+            throws IOException {
         return createClientTransport(sipRequest, inetAddress, port, transport,
                 NO_TTL);
     }
-    
+
     public MessageSender createClientTransport(SipRequest sipRequest,
-            InetAddress inetAddress, int port, String transport, int ttl)
-                throws IOException {
+                                               InetAddress inetAddress, int port, String transport, int ttl)
+            throws IOException {
         //18.1
-        
+
         //via created by transaction layer to add branchid
         SipHeaderFieldValue via = Utils.getTopVia(sipRequest);
-        StringBuffer buf = new StringBuffer(DEFAULT_SIP_VERSION);
-        buf.append(TRANSPORT_VIA_SEP);
+        StringBuilder builder = new StringBuilder(DEFAULT_SIP_VERSION);
+        builder.append(TRANSPORT_VIA_SEP);
         if (sipRequest.toString().getBytes().length > TRANSPORT_UDP_USUAL_MAX_SIZE) {
             transport = TRANSPORT_TCP;
         }
-        buf.append(transport);
+        builder.append(transport);
         if (inetAddress.isMulticastAddress()) {
             SipHeaderParamName maddrName = new SipHeaderParamName(PARAM_MADDR);
             via.addParam(maddrName, inetAddress.getHostAddress());
@@ -120,18 +100,18 @@ public class TransportManager {
         //TODO check config
         via.addParam(new SipHeaderParamName(RFC3261.PARAM_RPORT), "");
 
-        buf.append(TRANSPORT_VIA_SEP2);//space
-        
+        builder.append(TRANSPORT_VIA_SEP2);//space
+
         //TODO user server connection
-        
+
         InetAddress myAddress = config.getPublicInetAddress();
         if (myAddress == null) {
             myAddress = config.getLocalInetAddress();
         }
 
-        buf.append(myAddress.getHostAddress()); //TODO use getHostName if real DNS
-        buf.append(TRANSPORT_PORT_SEP);
-        
+        builder.append(myAddress.getHostAddress()); //TODO use getHostName if real DNS
+        builder.append(TRANSPORT_PORT_SEP);
+
 
         if (sipPort < 1) {
             //use default port
@@ -144,11 +124,11 @@ public class TransportManager {
                 throw new RuntimeException("unknown transport type");
             }
         }
-        buf.append(sipPort);
+        builder.append(sipPort);
         //TODO add sent-by (p. 143) Before...
-        
-        via.setValue(buf.toString());
-        
+
+        via.setValue(builder.toString());
+
         SipTransportConnection connection = new SipTransportConnection(
                 config.getLocalInetAddress(), sipPort, inetAddress, port,
                 transport);
@@ -159,17 +139,17 @@ public class TransportManager {
         }
         return messageSender;
     }
-    
+
     private String threadName(int port) {
         return getClass().getSimpleName() + " " + port;
     }
-    
+
     public void createServerTransport(String transportType, int port)
             throws SocketException {
         SipTransportConnection conn = new SipTransportConnection(
-                    config.getLocalInetAddress(), port, null,
-                    SipTransportConnection.EMPTY_PORT, transportType);
-        
+                config.getLocalInetAddress(), port, null,
+                SipTransportConnection.EMPTY_PORT, transportType);
+
         MessageReceiver messageReceiver = messageReceivers.get(conn);
         if (messageReceiver == null) {
             messageReceiver = createMessageReceiver(conn);
@@ -179,7 +159,7 @@ public class TransportManager {
             new Thread(messageReceiver, threadName(port)).start();
         }
     }
-    
+
     public void sendResponse(SipResponse sipResponse) throws IOException {
         //18.2.2
         SipHeaderFieldValue topVia = Utils.getTopVia(sipResponse);
@@ -209,7 +189,7 @@ public class TransportManager {
             host = hostport;
             port = RFC3261.TRANSPORT_DEFAULT_PORT;
         }
-        
+
         String transport;
         if (buf.indexOf(RFC3261.TRANSPORT_TCP) > -1) {
             transport = RFC3261.TRANSPORT_TCP;
@@ -220,9 +200,9 @@ public class TransportManager {
                     " discarding response");
             return;
         }
-        
+
         String received =
-            topVia.getParam(new SipHeaderParamName(RFC3261.PARAM_RECEIVED));
+                topVia.getParam(new SipHeaderParamName(RFC3261.PARAM_RECEIVED));
         if (received != null) {
             host = received;
         }
@@ -242,9 +222,9 @@ public class TransportManager {
             logger.error("unknwon host", e);
             return;
         }
-        
+
         //actual sending
-        
+
         //TODO manage maddr parameter in top via for multicast
         if (buf.indexOf(RFC3261.TRANSPORT_TCP) > -1) {
 //            Socket socket = (Socket)factory.connections.get(connection);
@@ -281,20 +261,19 @@ public class TransportManager {
             //add contact header
             SipHeaderFieldName contactName = new SipHeaderFieldName(RFC3261.HDR_CONTACT);
             SipHeaders respHeaders = sipResponse.getSipHeaders();
-            StringBuffer contactBuf = new StringBuffer();
-            contactBuf.append(RFC3261.LEFT_ANGLE_BRACKET);
-            contactBuf.append(RFC3261.SIP_SCHEME);
-            contactBuf.append(RFC3261.SCHEME_SEPARATOR);
-            contactBuf.append(messageSender.getContact());
-            contactBuf.append(RFC3261.RIGHT_ANGLE_BRACKET);
-            respHeaders.add(contactName, new SipHeaderFieldValue(contactBuf.toString()));
+            String contactBuf = RFC3261.LEFT_ANGLE_BRACKET +
+                    RFC3261.SIP_SCHEME +
+                    RFC3261.SCHEME_SEPARATOR +
+                    messageSender.getContact() +
+                    RFC3261.RIGHT_ANGLE_BRACKET;
+            respHeaders.add(contactName, new SipHeaderFieldValue(contactBuf));
             messageSender.sendMessage(sipResponse);
 
         }
-        
-        
+
+
     }
-    
+
     private MessageSender createMessageSender(final SipTransportConnection conn)
             throws IOException {
         MessageSender messageSender = null;
@@ -307,10 +286,7 @@ public class TransportManager {
                         + ", " + conn.getLocalInetAddress() + ")");
                 // AccessController.doPrivileged added for plugin compatibility
                 datagramSocket = AccessController.doPrivileged(
-                    new PrivilegedAction<DatagramSocket>() {
-
-                        @Override
-                        public DatagramSocket run() {
+                        (PrivilegedAction<DatagramSocket>) () -> {
                             try {
                                 return new DatagramSocket(conn.getLocalPort(),
                                         conn.getLocalInetAddress());
@@ -321,7 +297,6 @@ public class TransportManager {
                             }
                             return null;
                         }
-                    }
                 );
                 if (datagramSocket == null) {
                     throw new SocketException();
@@ -340,13 +315,13 @@ public class TransportManager {
         messageSenders.put(conn, messageSender);
         //when a mesage is sent over a transport, the transport layer
         //must also be able to receive messages on this transport
-        
+
 //        MessageReceiver messageReceiver =
 //            createMessageReceiver(conn, socket);
         MessageReceiver messageReceiver = messageReceivers.get(conn);
         if (messageReceiver == null) {
-        	messageReceiver = createMessageReceiver(conn, socket);
-        	new Thread(messageReceiver, threadName(conn.getLocalPort())).start();
+            messageReceiver = createMessageReceiver(conn, socket);
+            new Thread(messageReceiver, threadName(conn.getLocalPort())).start();
         }
 //        if (RFC3261.TRANSPORT_UDP.equalsIgnoreCase(conn.getTransport())) {
 //            messageSender = new UdpMessageSender(conn.getRemoteInetAddress(),
@@ -355,12 +330,12 @@ public class TransportManager {
 //        }
         return messageSender;
     }
-    
+
     private MessageReceiver createMessageReceiver(SipTransportConnection conn,
-            Object socket) throws IOException {
+                                                  Object socket) throws IOException {
         MessageReceiver messageReceiver = null;
         if (RFC3261.TRANSPORT_UDP.equalsIgnoreCase(conn.getTransport())) {
-            DatagramSocket datagramSocket = (DatagramSocket)socket;
+            DatagramSocket datagramSocket = (DatagramSocket) socket;
             messageReceiver = new UdpMessageReceiver(datagramSocket,
                     transactionManager, this, config, logger);
             messageReceiver.setSipServerTransportUser(sipServerTransportUser);
@@ -368,7 +343,7 @@ public class TransportManager {
         messageReceivers.put(conn, messageReceiver);
         return messageReceiver;
     }
-    
+
     private MessageReceiver createMessageReceiver(final SipTransportConnection conn)
             throws SocketException {
         MessageReceiver messageReceiver = null;
@@ -380,22 +355,18 @@ public class TransportManager {
                         + ", " + conn.getLocalInetAddress() + ")");
                 // AccessController.doPrivileged added for plugin compatibility
                 datagramSocket = AccessController.doPrivileged(
-                        new PrivilegedAction<DatagramSocket>() {
-
-                            @Override
-                            public DatagramSocket run() {
-                                try {
-                                    return new DatagramSocket(conn.getLocalPort(),
-                                            conn.getLocalInetAddress());
-                                } catch (SocketException e) {
-                                    logger.error("cannot create socket", e);
-                                } catch (SecurityException e) {
-                                    logger.error("security exception", e);
-                                }
-                                return null;
+                        (PrivilegedAction<DatagramSocket>) () -> {
+                            try {
+                                return new DatagramSocket(conn.getLocalPort(),
+                                        conn.getLocalInetAddress());
+                            } catch (SocketException e) {
+                                logger.error("cannot create socket", e);
+                            } catch (SecurityException e) {
+                                logger.error("security exception", e);
                             }
+                            return null;
                         }
-                    );
+                );
                 datagramSocket.setSoTimeout(SOCKET_TIMEOUT);
                 if (conn.getLocalPort() == 0) {
                     sipTransportConnection = new SipTransportConnection(
@@ -430,36 +401,30 @@ public class TransportManager {
     }
 
     public void closeTransports() {
-        for (MessageReceiver messageReceiver: messageReceivers.values()) {
+        for (MessageReceiver messageReceiver : messageReceivers.values()) {
             messageReceiver.setListening(false);
         }
-        for (MessageSender messageSender: messageSenders.values()) {
+        for (MessageSender messageSender : messageSenders.values()) {
             messageSender.stopKeepAlives();
         }
-        try
-		{
-			Thread.sleep(SOCKET_TIMEOUT);
-		}
-		catch (InterruptedException e)
-		{
-			return;
-		}
+        try {
+            Thread.sleep(SOCKET_TIMEOUT);
+        } catch (InterruptedException e) {
+            return;
+        }
         // AccessController.doPrivileged added for plugin compatibility
         AccessController.doPrivileged(
-            new PrivilegedAction<Void>() {
-                @Override
-                public Void run() {
-                    for (DatagramSocket datagramSocket: datagramSockets.values()) {
+                (PrivilegedAction<Void>) () -> {
+                    for (DatagramSocket datagramSocket : datagramSockets.values()) {
                         datagramSocket.close();
                     }
                     return null;
                 }
-            }
         );
 
-		datagramSockets.clear();
-		messageReceivers.clear();
-		messageSenders.clear();
+        datagramSockets.clear();
+        messageReceivers.clear();
+        messageSenders.clear();
     }
 
     public MessageSender getMessageSender(

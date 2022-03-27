@@ -19,31 +19,27 @@
 
 package net.sourceforge.peers.sip.core.useragent;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
-import java.util.UUID;
 import net.sourceforge.peers.Config;
 import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC2617;
 import net.sourceforge.peers.sip.RFC3261;
-import net.sourceforge.peers.sip.syntaxencoding.SipHeaderFieldName;
-import net.sourceforge.peers.sip.syntaxencoding.SipHeaderFieldValue;
-import net.sourceforge.peers.sip.syntaxencoding.SipHeaderParamName;
-import net.sourceforge.peers.sip.syntaxencoding.SipHeaders;
-import net.sourceforge.peers.sip.syntaxencoding.SipUriSyntaxException;
+import net.sourceforge.peers.sip.syntaxencoding.*;
 import net.sourceforge.peers.sip.transactionuser.Dialog;
 import net.sourceforge.peers.sip.transactionuser.DialogManager;
 import net.sourceforge.peers.sip.transport.SipMessage;
 import net.sourceforge.peers.sip.transport.SipRequest;
 import net.sourceforge.peers.sip.transport.SipResponse;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
+
 public class ChallengeManager implements MessageInterceptor {
 
     public static final String ALGORITHM_MD5 = "MD5";
-    
+
     private String username;
     private String password;
     private String realm;
@@ -55,26 +51,26 @@ public class ChallengeManager implements MessageInterceptor {
     private String qop;
     private String cnonce;
     private String authorizationUsername;
-    
+
     private static volatile int nonceCount = 1;
     private String nonceCountHex;
 
-    private Config config;
-    private Logger logger;
+    private final Config config;
+    private final Logger logger;
 
     // FIXME what happens if a challenge is received for a register-refresh
     //       and another challenge is received in the mean time for an invite?
     private int statusCode;
     private SipHeaderFieldValue contact;
-    
+
     private InitialRequestManager initialRequestManager;
     private MidDialogRequestManager midDialogRequestManager;
     private DialogManager dialogManager;
-    
+
     public ChallengeManager(Config config,
-            InitialRequestManager initialRequestManager,
-            MidDialogRequestManager midDialogRequestManager,
-            DialogManager dialogManager, Logger logger) {
+                            InitialRequestManager initialRequestManager,
+                            MidDialogRequestManager midDialogRequestManager,
+                            DialogManager dialogManager, Logger logger) {
         this.config = config;
         this.initialRequestManager = initialRequestManager;
         this.midDialogRequestManager = midDialogRequestManager;
@@ -91,7 +87,7 @@ public class ChallengeManager implements MessageInterceptor {
         }
         password = config.getPassword();
         profileUri = RFC3261.SIP_SCHEME + RFC3261.SCHEME_SEPARATOR
-            + username + RFC3261.AT + config.getDomain();
+                + username + RFC3261.AT + config.getDomain();
     }
 
     private String md5hash(String message) {
@@ -114,8 +110,8 @@ public class ChallengeManager implements MessageInterceptor {
     }
 
     public void handleChallenge(SipRequest sipRequest,
-            SipResponse sipResponse) {
-        init();        
+                                SipResponse sipResponse) {
+        init();
         statusCode = sipResponse.getStatusCode();
         SipHeaders responseHeaders = sipResponse.getSipHeaders();
         SipHeaders requestHeaders = sipRequest.getSipHeaders();
@@ -146,7 +142,7 @@ public class ChallengeManager implements MessageInterceptor {
         nonce = getParameter(RFC2617.PARAM_NONCE, headerValue);
         opaque = getParameter(RFC2617.PARAM_OPAQUE, headerValue);
         qop = getParameter(RFC2617.PARAM_QOP, headerValue);
-        if( "auth".equals(qop)) {      
+        if ("auth".equals(qop)) {
             nonceCountHex = String.format("%08X", nonceCount++);
         }
         String method = sipRequest.getMethod();
@@ -160,14 +156,14 @@ public class ChallengeManager implements MessageInterceptor {
                 new SipHeaderFieldName(RFC3261.HDR_CALLID)).getValue();
         Dialog dialog = dialogManager.getDialog(callId);
         if (dialog != null) {
-        	midDialogRequestManager.generateMidDialogRequest(
+            midDialogRequestManager.generateMidDialogRequest(
                     dialog, RFC3261.METHOD_BYE, this);
         } else {
             SipHeaderFieldValue from = requestHeaders.get(
                     new SipHeaderFieldName(RFC3261.HDR_FROM));
             String fromTag = from.getParam(new SipHeaderParamName(
                     RFC3261.PARAM_TAG));
-        	try {
+            try {
                 initialRequestManager.createInitialRequest(
                         requestUri, method, profileUri, callId, fromTag, this);
             } catch (SipUriSyntaxException e) {
@@ -175,37 +171,37 @@ public class ChallengeManager implements MessageInterceptor {
             }
         }
     }
-    
+
     private String getRequestDigest(String method) {
-        StringBuffer buf = new StringBuffer();
-        buf.append(authorizationUsername);
-        buf.append(RFC2617.DIGEST_SEPARATOR);
-        buf.append(realm);
-        buf.append(RFC2617.DIGEST_SEPARATOR);
-        buf.append(password);
-        String ha1 = md5hash(buf.toString());
-        buf = new StringBuffer();
-        buf.append(method);
-        buf.append(RFC2617.DIGEST_SEPARATOR);
-        buf.append(requestUri);
-        String ha2 = md5hash(buf.toString());
-        buf = new StringBuffer();
-        buf.append(ha1);
-        buf.append(RFC2617.DIGEST_SEPARATOR);
-        buf.append(nonce);
-        buf.append(RFC2617.DIGEST_SEPARATOR);
-        if("auth".equals(qop)) {      
-            buf.append(nonceCountHex);
-            buf.append(RFC2617.DIGEST_SEPARATOR);
-            buf.append(cnonce);
-            buf.append(RFC2617.DIGEST_SEPARATOR);
-            buf.append(qop);
-            buf.append(RFC2617.DIGEST_SEPARATOR);
+        StringBuilder builder = new StringBuilder();
+        builder.append(authorizationUsername);
+        builder.append(RFC2617.DIGEST_SEPARATOR);
+        builder.append(realm);
+        builder.append(RFC2617.DIGEST_SEPARATOR);
+        builder.append(password);
+        String ha1 = md5hash(builder.toString());
+        builder = new StringBuilder();
+        builder.append(method);
+        builder.append(RFC2617.DIGEST_SEPARATOR);
+        builder.append(requestUri);
+        String ha2 = md5hash(builder.toString());
+        builder = new StringBuilder();
+        builder.append(ha1);
+        builder.append(RFC2617.DIGEST_SEPARATOR);
+        builder.append(nonce);
+        builder.append(RFC2617.DIGEST_SEPARATOR);
+        if ("auth".equals(qop)) {
+            builder.append(nonceCountHex);
+            builder.append(RFC2617.DIGEST_SEPARATOR);
+            builder.append(cnonce);
+            builder.append(RFC2617.DIGEST_SEPARATOR);
+            builder.append(qop);
+            builder.append(RFC2617.DIGEST_SEPARATOR);
         }
-        buf.append(ha2);
-        return md5hash(buf.toString());
+        builder.append(ha2);
+        return md5hash(builder.toString());
     }
-    
+
     private String getParameter(String paramName, String header) {
         int paramPos = header.indexOf(paramName);
         if (paramPos < 0) {
@@ -213,29 +209,35 @@ public class ChallengeManager implements MessageInterceptor {
         }
         int paramNameLength = paramName.length();
         if (paramPos + paramNameLength + 3 > header.length()) {
-            logger.info("Malformed " + RFC3261.HDR_WWW_AUTHENTICATE + " header");
+            logMalformedHeader();
             return null;
         }
         if (header.charAt(paramPos + paramNameLength) !=
-                    RFC2617.PARAM_VALUE_SEPARATOR) {
-            logger.info("Malformed " + RFC3261.HDR_WWW_AUTHENTICATE + " header");
+                RFC2617.PARAM_VALUE_SEPARATOR) {
+            logMalformedHeader();
             return null;
         }
         if (header.charAt(paramPos + paramNameLength + 1) !=
-                    RFC2617.PARAM_VALUE_DELIMITER) {
-            logger.info("Malformed " + RFC3261.HDR_WWW_AUTHENTICATE + " header");
+                RFC2617.PARAM_VALUE_DELIMITER) {
+            logMalformedHeader();
             return null;
         }
         header = header.substring(paramPos + paramNameLength + 2);
         int endDelimiter = header.indexOf(RFC2617.PARAM_VALUE_DELIMITER);
         if (endDelimiter < 0) {
-            logger.info("Malformed " + RFC3261.HDR_WWW_AUTHENTICATE + " header");
+            logMalformedHeader();
             return null;
         }
         return header.substring(0, endDelimiter);
     }
 
-    /** add xxxAuthorization header */
+    private void logMalformedHeader() {
+        logger.info("Malformed " + RFC3261.HDR_WWW_AUTHENTICATE + " header");
+    }
+
+    /**
+     * add xxxAuthorization header
+     */
     public void postProcess(SipMessage sipMessage) {
         if (realm == null || nonce == null || digest == null) {
             return;
@@ -245,7 +247,7 @@ public class ChallengeManager implements MessageInterceptor {
                 new SipHeaderFieldName(RFC3261.HDR_CSEQ)).getValue();
         String method = cseq.substring(cseq.trim().lastIndexOf(' ') + 1);
         digest = getRequestDigest(method);
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(RFC2617.SCHEME_DIGEST).append(" ");
         appendParameter(buf, RFC2617.PARAM_USERNAME, authorizationUsername);
         buf.append(RFC2617.PARAM_SEPARATOR).append(" ");
@@ -256,7 +258,7 @@ public class ChallengeManager implements MessageInterceptor {
         appendParameter(buf, RFC2617.PARAM_URI, requestUri);
         buf.append(RFC2617.PARAM_SEPARATOR).append(" ");
         appendParameter(buf, RFC2617.PARAM_RESPONSE, digest);
-        if("auth".equals(qop)) {
+        if ("auth".equals(qop)) {
             buf.append(RFC2617.PARAM_SEPARATOR).append(" ");
             appendParameter(buf, RFC2617.PARAM_NC, nonceCountHex);
             buf.append(RFC2617.PARAM_SEPARATOR).append(" ");
@@ -283,22 +285,22 @@ public class ChallengeManager implements MessageInterceptor {
         // manage authentication on unregister challenge...
         if (contact != null) {
             SipHeaderParamName expiresName =
-                new SipHeaderParamName(RFC3261.PARAM_EXPIRES);
+                    new SipHeaderParamName(RFC3261.PARAM_EXPIRES);
             String expiresString = contact.getParam(expiresName);
             if (expiresString != null && Integer.parseInt(expiresString) == 0) {
                 SipHeaderFieldValue requestContact =
-                    sipHeaders.get(new SipHeaderFieldName(RFC3261.HDR_CONTACT));
+                        sipHeaders.get(new SipHeaderFieldName(RFC3261.HDR_CONTACT));
                 requestContact.addParam(expiresName, expiresString);
             }
         }
     }
-    
-    private void appendParameter(StringBuffer buf, String name, String value) {
-        buf.append(name);
-        buf.append(RFC2617.PARAM_VALUE_SEPARATOR);
-        buf.append(RFC2617.PARAM_VALUE_DELIMITER);
-        buf.append(value);
-        buf.append(RFC2617.PARAM_VALUE_DELIMITER);
+
+    private void appendParameter(StringBuilder builder, String name, String value) {
+        builder.append(name);
+        builder.append(RFC2617.PARAM_VALUE_SEPARATOR);
+        builder.append(RFC2617.PARAM_VALUE_DELIMITER);
+        builder.append(value);
+        builder.append(RFC2617.PARAM_VALUE_DELIMITER);
     }
-    
-    }
+
+}

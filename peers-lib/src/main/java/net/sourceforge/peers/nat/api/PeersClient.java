@@ -27,7 +27,7 @@ public abstract class PeersClient {
      *        to the computer or to a person (email).
      * @param dataReceiver object that will receive incoming traffic.
      */
-    public PeersClient(String myId, DataReceiver dataReceiver) {
+    protected PeersClient(String myId, DataReceiver dataReceiver) {
         
     }
 

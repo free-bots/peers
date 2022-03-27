@@ -27,8 +27,8 @@ import net.sourceforge.peers.Logger;
 
 public class PcmuEncoder extends Encoder {
 
-    private final static int cBias = 0x84;
-    private final static short seg_end[] = new short[]{0xFF, 0x1FF, 0x3FF, 0x7FF,
+    private static final int cBias = 0x84;
+    private static final short[] seg_end = new short[]{0xFF, 0x1FF, 0x3FF, 0x7FF,
         0xFFF, 0x1FFF, 0x3FFF, 0x7FFF
     };
 

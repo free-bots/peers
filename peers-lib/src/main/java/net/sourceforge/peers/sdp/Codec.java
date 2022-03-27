@@ -21,6 +21,8 @@ package net.sourceforge.peers.sdp;
 
 import net.sourceforge.peers.media.MediaManager;
 
+import java.util.Objects;
+
 public class Codec {
 
     private int payloadType;
@@ -43,11 +45,16 @@ public class Codec {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(payloadType, name);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Codec)) {
             return false;
         }
-        Codec codec = (Codec)obj;
+        Codec codec = (Codec) obj;
         if (codec.getName() == null) {
             return name == null;
         }
@@ -56,12 +63,10 @@ public class Codec {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(RFC4566.TYPE_ATTRIBUTE).append(RFC4566.SEPARATOR);
-        buf.append(RFC4566.ATTR_RTPMAP).append(RFC4566.ATTR_SEPARATOR);
-        buf.append(payloadType).append(" ").append(name).append("/");
-        buf.append(MediaManager.DEFAULT_CLOCK).append("\r\n");
-        return buf.toString();
+        return String.valueOf(RFC4566.TYPE_ATTRIBUTE) + RFC4566.SEPARATOR +
+                RFC4566.ATTR_RTPMAP + RFC4566.ATTR_SEPARATOR +
+                payloadType + " " + name + "/" +
+                MediaManager.DEFAULT_CLOCK + "\r\n";
     }
 
 }

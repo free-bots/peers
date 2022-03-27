@@ -19,6 +19,10 @@
 
 package net.sourceforge.peers.sip.transport;
 
+import net.sourceforge.peers.Config;
+import net.sourceforge.peers.Logger;
+import net.sourceforge.peers.sip.RFC3261;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -27,18 +31,14 @@ import java.net.SocketException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import net.sourceforge.peers.Config;
-import net.sourceforge.peers.Logger;
-import net.sourceforge.peers.sip.RFC3261;
-
 
 public class UdpMessageSender extends MessageSender {
 
     private DatagramSocket datagramSocket;
-    
+
     public UdpMessageSender(InetAddress inetAddress, int port,
-            DatagramSocket datagramSocket, Config config,
-            Logger logger) throws SocketException {
+                            DatagramSocket datagramSocket, Config config,
+                            Logger logger) throws SocketException {
         super(datagramSocket.getLocalPort(), inetAddress, port,
                 config, RFC3261.TRANSPORT_UDP, logger);
         this.datagramSocket = datagramSocket;
@@ -52,10 +52,9 @@ public class UdpMessageSender extends MessageSender {
         }
         byte[] buf = sipMessage.toString().getBytes();
         sendBytes(buf);
-        StringBuffer direction = new StringBuffer();
-        direction.append("SENT to ").append(inetAddress.getHostAddress());
-        direction.append("/").append(port);
-        logger.traceNetwork(new String(buf), direction.toString());
+        String direction = "SENT to " + inetAddress.getHostAddress() +
+                "/" + port;
+        logger.traceNetwork(new String(buf), direction);
     }
 
     @Override
@@ -67,23 +66,19 @@ public class UdpMessageSender extends MessageSender {
                 + " " + inetAddress + ":" + port);
         // AccessController.doPrivileged added for plugin compatibility
         AccessController.doPrivileged(
-            new PrivilegedAction<Void>() {
-
-                @Override
-                public Void run() {
+                (PrivilegedAction<Void>) () -> {
                     try {
                         if (!datagramSocket.isClosed()) {
                             logger.debug("Local internet-address: " + datagramSocket.getLocalAddress().toString());
                             datagramSocket.send(packet);
                         } else {
-                            logger.error("Socket closed. Packet of " + bytes.length  + " bytes not sent to " + inetAddress + ":" + port);
+                            logger.error("Socket closed. Packet of " + bytes.length + " bytes not sent to " + inetAddress + ":" + port);
                         }
                     } catch (Throwable t) {
                         logger.error("throwable", new Exception(t));
                     }
                     return null;
                 }
-            }
         );
 
         logger.debug("UdpMessageSender.sendBytes packet sent");

@@ -51,8 +51,8 @@ public class TransactionManager {
     
     public TransactionManager(Logger logger) {
         this.logger = logger;
-        clientTransactions = new Hashtable<String, ClientTransaction>();
-        serverTransactions = new Hashtable<String, ServerTransaction>();
+        clientTransactions = new Hashtable<>();
+        serverTransactions = new Hashtable<>();
         timer = new Timer(TransactionManager.class.getSimpleName()
                 + " " + Timer.class.getSimpleName());
     }
@@ -127,7 +127,7 @@ public class TransactionManager {
     public List<ClientTransaction> getClientTransactionsFromCallId(String callId,
             String method) {
         ArrayList<ClientTransaction> clientTransactionsFromCallId =
-            new ArrayList<ClientTransaction>();
+            new ArrayList<>();
         for (ClientTransaction clientTransaction: clientTransactions.values()) {
             Transaction transaction = (Transaction)clientTransaction;
             SipRequest sipRequest = transaction.getRequest();
@@ -201,11 +201,9 @@ public class TransactionManager {
     }
 
     private String getTransactionId(String branchId, String method) {
-        StringBuffer buf = new StringBuffer();
-        buf.append(branchId);
-        buf.append(Transaction.ID_SEPARATOR);
-        buf.append(method);
-        return buf.toString();
+        return branchId +
+                Transaction.ID_SEPARATOR +
+                method;
     }
 
     public void setTransportManager(TransportManager transportManager) {

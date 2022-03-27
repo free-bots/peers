@@ -32,7 +32,7 @@ public class SipHeadersTable {
      * should be instanciated only once, it was a singleton.
      */
     public SipHeadersTable() {
-        headers = new HashMap<Character, String>();
+        headers = new HashMap<>();
         //RFC 3261 Section 10
         headers.put(RFC3261.COMPACT_HDR_CALLID,           RFC3261.HDR_CALLID);
         headers.put(RFC3261.COMPACT_HDR_CONTACT,          RFC3261.HDR_CONTACT);

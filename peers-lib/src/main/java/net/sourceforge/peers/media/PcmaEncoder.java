@@ -27,8 +27,8 @@ import net.sourceforge.peers.Logger;
 
 public class PcmaEncoder extends Encoder {
 
-    private final static int cClip = 32635;
-    private static byte aLawCompressTable[] = new byte[]{
+    private static final int cClip = 32635;
+    private static final byte[] aLawCompressTable = new byte[]{
         1, 1, 2, 2, 3, 3, 3, 3,
         4, 4, 4, 4, 4, 4, 4, 4,
         5, 5, 5, 5, 5, 5, 5, 5,
@@ -59,7 +59,7 @@ public class PcmaEncoder extends Encoder {
 
         int j = 0;
         for (int i = 0; i < compressed.length; i++) {
-            short sample = (short) (((media[j++] & 0xff) | (media[j++]) << 8));
+            short sample = (short) (media[j++] & 0xff | media[j++] << 8);
             compressed[i] = linearToALawSample(sample);
         }
         return compressed;

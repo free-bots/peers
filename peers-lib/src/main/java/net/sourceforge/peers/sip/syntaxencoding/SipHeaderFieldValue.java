@@ -19,17 +19,18 @@
 
 package net.sourceforge.peers.sip.syntaxencoding;
 
-import java.util.HashMap;
-
 import net.sourceforge.peers.sip.RFC3261;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class SipHeaderFieldValue {
 
     private String value;
-    
-    private HashMap<SipHeaderParamName, String> params;
-    
+
+    private final HashMap<SipHeaderParamName, String> params;
+
     public SipHeaderFieldValue(String value) {
         int startPos = value.indexOf(RFC3261.RIGHT_ANGLE_BRACKET);
         int pos;
@@ -40,13 +41,13 @@ public class SipHeaderFieldValue {
         }
         String paramsString;
         if (pos > -1) {
-            this.value = value.substring(0,pos);
+            this.value = value.substring(0, pos);
             paramsString = value.substring(pos);
         } else {
             this.value = value;
             paramsString = "";
         }
-        params = new HashMap<SipHeaderParamName, String>();
+        params = new HashMap<>();
         if (paramsString.contains(RFC3261.PARAM_SEPARATOR)) {
             String[] arr = paramsString.split(RFC3261.PARAM_SEPARATOR);
             if (arr.length > 1) {
@@ -67,15 +68,15 @@ public class SipHeaderFieldValue {
     public String getParam(SipHeaderParamName name) {
         return params.get(name);
     }
-    
+
     public void addParam(SipHeaderParamName name, String value) {
         params.put(name, value);
     }
-    
+
     public void removeParam(SipHeaderParamName name) {
         params.remove(name);
     }
-    
+
     public String getValue() {
         return value;
     }
@@ -89,12 +90,12 @@ public class SipHeaderFieldValue {
         if (params == null || params.isEmpty()) {
             return value;
         }
-        StringBuffer buf = new StringBuffer(value);
-        for (SipHeaderParamName name: params.keySet()) {
-            buf.append(RFC3261.PARAM_SEPARATOR).append(name);
-            String value = params.get(name);
-            if (!"".equals(value.trim())) {
-                buf.append(RFC3261.PARAM_ASSIGNMENT).append(value);
+        StringBuilder buf = new StringBuilder(value);
+        for (Map.Entry<SipHeaderParamName, String> entry : params.entrySet()) {
+            buf.append(RFC3261.PARAM_SEPARATOR).append(entry.getKey());
+            String entryValue = entry.getValue();
+            if (!"".equals(entryValue.trim())) {
+                buf.append(RFC3261.PARAM_ASSIGNMENT).append(entryValue);
             }
         }
         return buf.toString();

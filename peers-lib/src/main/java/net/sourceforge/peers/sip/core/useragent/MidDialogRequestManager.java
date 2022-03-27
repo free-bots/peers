@@ -136,10 +136,9 @@ public class MidDialogRequestManager extends RequestManager
             logger.error("unknown host: " + sipUri.getHost(), e);
             return null;
         }
-        ClientTransaction clientTransaction = transactionManager
+        return transactionManager
             .createClientTransaction(sipRequest, inetAddress, port, transport,
                     branchId, clientTransactionUser);
-        return clientTransaction;
     }
     
     
@@ -184,7 +183,7 @@ public class MidDialogRequestManager extends RequestManager
                         this, sipRequest);
             serverTransaction.start();
             serverTransaction.receivedRequest(sipRequest);
-            serverTransaction.sendReponse(sipResponse);
+            serverTransaction.sendResponse(sipResponse);
         } else {
             dialog.setRemoteCSeq(newCseq);
         }

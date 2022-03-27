@@ -93,10 +93,10 @@ public class SessionDescription {
 	
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append("v=0\r\n");
-        buf.append("o=").append(username).append(" ").append(id);
-        buf.append(" ").append(version);
+        StringBuilder builder = new StringBuilder();
+        builder.append("v=0\r\n");
+        builder.append("o=").append(username).append(" ").append(id);
+        builder.append(" ").append(version);
         int ipVersion;
         if (ipAddress instanceof Inet4Address) {
             ipVersion = 4;
@@ -105,25 +105,25 @@ public class SessionDescription {
         } else {
             throw new RuntimeException("unknown ip version: " + ipAddress);
         }
-        buf.append(" IN IP").append(ipVersion).append(" ");
+        builder.append(" IN IP").append(ipVersion).append(" ");
         String hostAddress = ipAddress.getHostAddress();
-        buf.append(hostAddress).append("\r\n");
-        buf.append("s=").append(name).append("\r\n");
-        buf.append("c=IN IP").append(ipVersion).append(" ");
-        buf.append(hostAddress).append("\r\n");
-        buf.append("t=0 0\r\n");
+        builder.append(hostAddress).append("\r\n");
+        builder.append("s=").append(name).append("\r\n");
+        builder.append("c=IN IP").append(ipVersion).append(" ");
+        builder.append(hostAddress).append("\r\n");
+        builder.append("t=0 0\r\n");
         for (String attributeName: attributes.keySet()) {
             String attributeValue = attributes.get(attributeName);
-            buf.append("a=").append(attributeName);
+            builder.append("a=").append(attributeName);
             if (attributeValue != null && !"".equals(attributeValue.trim())) {
-                buf.append(":");
-                buf.append(attributeValue);
-                buf.append("\r\n");
+                builder.append(":");
+                builder.append(attributeValue);
+                builder.append("\r\n");
             }
         }
         for (MediaDescription mediaDescription: mediaDescriptions) {
-            buf.append(mediaDescription.toString());
+            builder.append(mediaDescription.toString());
         }
-        return buf.toString();
+        return builder.toString();
     }
 }

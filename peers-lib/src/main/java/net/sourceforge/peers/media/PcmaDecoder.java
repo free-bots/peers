@@ -21,7 +21,7 @@ package net.sourceforge.peers.media;
 
 public class PcmaDecoder extends Decoder {
 
-    private static short aLawDecompressTable[] = new short[]{
+    private static final short[] aLawDecompressTable = new short[]{
         -5504, -5248, -6016, -5760, -4480, -4224, -4992, -4736,
         -7552, -7296, -8064, -7808, -6528, -6272, -7040, -6784,
         -2752, -2624, -3008, -2880, -2240, -2112, -2496, -2368,
@@ -60,8 +60,8 @@ public class PcmaDecoder extends Decoder {
     public byte[] process(byte[] media) {
         byte[] res = new byte[media.length * 2];
         int j = 0;
-        for (int i = 0; i < media.length; i++) {
-            short s = aLawDecompressTable[media[i] & 0xff];
+        for (byte b : media) {
+            short s = aLawDecompressTable[b & 0xff];
             res[j++] = (byte) s;
             res[j++] = (byte) (s >> 8);
         }

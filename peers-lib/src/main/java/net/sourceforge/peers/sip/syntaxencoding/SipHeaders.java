@@ -19,22 +19,20 @@
 
 package net.sourceforge.peers.sip.syntaxencoding;
 
-import java.util.ArrayList;
-
 import net.sourceforge.peers.sip.RFC3261;
 
+import java.util.ArrayList;
 
 
 public class SipHeaders {
-    
+
     private ArrayList<SipHeader> headers;
-    
+
     public SipHeaders() {
-        headers = new ArrayList<SipHeader>();
+        headers = new ArrayList<>();
     }
-    
+
     /**
-     * 
      * @param name
      * @param value
      * @param index -1 to add at the end
@@ -42,14 +40,14 @@ public class SipHeaders {
     public void add(SipHeaderFieldName name, SipHeaderFieldValue value, int index) {
         SipHeader header = new SipHeader(name, value);
         if (headers.contains(header)) {
-            header =  headers.get(headers.indexOf(header));
+            header = headers.get(headers.indexOf(header));
             SipHeaderFieldValue oldValue = header.getValue();
             //TODO check is header can be multi valued
             if (oldValue instanceof SipHeaderFieldMultiValue) {
                 SipHeaderFieldMultiValue oldMultiVal = (SipHeaderFieldMultiValue) oldValue;
                 oldMultiVal.getValues().add(value);
             } else {
-                ArrayList<SipHeaderFieldValue> arr = new ArrayList<SipHeaderFieldValue>();
+                ArrayList<SipHeaderFieldValue> arr = new ArrayList<>();
                 arr.add(oldValue);
                 arr.add(value);
                 header.setValue(new SipHeaderFieldMultiValue(arr));
@@ -62,19 +60,19 @@ public class SipHeaders {
             }
         }
     }
-    
+
     public void add(SipHeaderFieldName name, SipHeaderFieldValue value) {
         add(name, value, -1);
     }
-    
+
     public void remove(SipHeaderFieldName name) {
         headers.remove(new SipHeader(name, null));
     }
-    
+
     public boolean contains(SipHeaderFieldName name) {
         return headers.contains(new SipHeader(name, null));
     }
-    
+
     public SipHeaderFieldValue get(SipHeaderFieldName name) {
         int index = headers.indexOf(new SipHeader(name, null));
         if (index < 0) {
@@ -82,20 +80,20 @@ public class SipHeaders {
         }
         return headers.get(index).getValue();
     }
-    
+
     public int getCount() {
         return headers.size();
     }
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder builder = new StringBuilder();
         for (SipHeader header : headers) {
-            buf.append(header.getName().toString());
-            buf.append(": ");
-            buf.append(header.getValue());
-            buf.append(RFC3261.CRLF);
+            builder.append(header.getName().toString());
+            builder.append(": ");
+            builder.append(header.getValue());
+            builder.append(RFC3261.CRLF);
         }
-        return buf.toString();
+        return builder.toString();
     }
 }

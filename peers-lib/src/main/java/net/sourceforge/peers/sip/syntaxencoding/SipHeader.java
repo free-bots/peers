@@ -19,9 +19,11 @@
 
 package net.sourceforge.peers.sip.syntaxencoding;
 
+import java.util.Objects;
+
 public class SipHeader {
 
-    private SipHeaderFieldName name;
+    private final SipHeaderFieldName name;
     private SipHeaderFieldValue value;
     
     SipHeader(SipHeaderFieldName name, SipHeaderFieldValue value) {
@@ -37,6 +39,11 @@ public class SipHeader {
             return name.equals(objHdr.name);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, value);
     }
 
     public SipHeaderFieldName getName() {

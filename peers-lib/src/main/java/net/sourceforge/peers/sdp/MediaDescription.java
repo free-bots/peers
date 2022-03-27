@@ -24,6 +24,7 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 public class MediaDescription {
 
@@ -76,15 +77,15 @@ public class MediaDescription {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(RFC4566.TYPE_MEDIA).append(RFC4566.SEPARATOR);
-        buf.append(type).append(" ").append(port);
-        buf.append(" RTP/AVP");
-        for (Codec codec: codecs) {
-            buf.append(" ");
-            buf.append(codec.getPayloadType());
+        StringBuilder builder = new StringBuilder();
+        builder.append(RFC4566.TYPE_MEDIA).append(RFC4566.SEPARATOR);
+        builder.append(type).append(" ").append(port);
+        builder.append(" RTP/AVP");
+        for (Codec codec : codecs) {
+            builder.append(" ");
+            builder.append(codec.getPayloadType());
         }
-        buf.append("\r\n");
+        builder.append("\r\n");
         if (ipAddress != null) {
             int ipVersion;
             if (ipAddress instanceof Inet4Address) {
@@ -94,25 +95,25 @@ public class MediaDescription {
             } else {
                 throw new RuntimeException("unknown ip version: " + ipAddress);
             }
-            buf.append(RFC4566.TYPE_CONNECTION).append(RFC4566.SEPARATOR);
-            buf.append("IN IP").append(ipVersion).append(" ");
-            buf.append(ipAddress.getHostAddress()).append("\r\n");
+            builder.append(RFC4566.TYPE_CONNECTION).append(RFC4566.SEPARATOR);
+            builder.append("IN IP").append(ipVersion).append(" ");
+            builder.append(ipAddress.getHostAddress()).append("\r\n");
         }
-        for (Codec codec: codecs) {
-            buf.append(codec.toString());
+        for (Codec codec : codecs) {
+            builder.append(codec.toString());
         }
         if (attributes != null) {
-            for (String attributeName: attributes.keySet()) {
-                buf.append(RFC4566.TYPE_ATTRIBUTE).append(RFC4566.SEPARATOR);
-                buf.append(attributeName);
-                String attributeValue = attributes.get(attributeName);
+            for (Map.Entry<String, String> entry : attributes.entrySet()) {
+                builder.append(RFC4566.TYPE_ATTRIBUTE).append(RFC4566.SEPARATOR);
+                builder.append(entry.getKey());
+                String attributeValue = entry.getValue();
                 if (attributeValue != null && !"".equals(attributeValue.trim())) {
-                    buf.append(":").append(attributeValue);
+                    builder.append(":").append(attributeValue);
                 }
-                buf.append("\r\n");
+                builder.append("\r\n");
             }
         }
-        return buf.toString();
+        return builder.toString();
     }
 
 }

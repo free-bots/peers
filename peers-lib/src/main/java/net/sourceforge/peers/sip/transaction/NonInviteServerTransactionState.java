@@ -26,18 +26,27 @@ import net.sourceforge.peers.sip.AbstractState;
 public abstract class NonInviteServerTransactionState extends AbstractState {
 
     protected NonInviteServerTransaction nonInviteServerTransaction;
-    
-    public NonInviteServerTransactionState(String id,
-            NonInviteServerTransaction nonInviteServerTransaction,
-            Logger logger) {
+
+    protected NonInviteServerTransactionState(String id,
+                                              NonInviteServerTransaction nonInviteServerTransaction,
+                                              Logger logger) {
         super(id, logger);
         this.nonInviteServerTransaction = nonInviteServerTransaction;
     }
 
-    public void received200To699() {}
-    public void received1xx() {}
-    public void receivedRequest() {}
-    public void transportError() {}
-    public void timerJFires() {}
+    public void received200To699() {
+    }
+
+    public void received1xx() {
+    }
+
+    public void receivedRequest() {
+    }
+
+    public void transportError() {
+    }
+
+    public void timerJFires() {
+    }
 }
 

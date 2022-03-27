@@ -44,4 +44,7 @@ public class RFC2617 {
     public static final char PARAM_VALUE_SEPARATOR = '=';
     public static final char PARAM_VALUE_DELIMITER = '"';
     public static final char DIGEST_SEPARATOR      = ':';
+
+    private RFC2617() {
+    }
 }

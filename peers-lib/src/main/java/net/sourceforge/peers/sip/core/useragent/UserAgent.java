@@ -51,8 +51,8 @@ import java.util.List;
 
 public class UserAgent implements DtmfEventHandler {
 
-    public final static String CONFIG_FILE = "conf" + File.separator + "peers.xml";
-    public final static int RTP_DEFAULT_PORT = 8000;
+    public static final String CONFIG_FILE = "conf" + File.separator + "peers.xml";
+    public static final int RTP_DEFAULT_PORT = 8000;
 
     private String peersHome;
     private Logger logger;
@@ -119,18 +119,17 @@ public class UserAgent implements DtmfEventHandler {
         this.abstractSoundManagerFactory = abstractSoundManagerFactory;
 
         cseqCounter = 1;
-        
-        StringBuffer buf = new StringBuffer();
-        buf.append("starting user agent [");
-        buf.append("myAddress: ");
-        buf.append(config.getLocalInetAddress().getHostAddress()).append(", ");
-        buf.append("sipPort: ");
-        buf.append(config.getSipPort()).append(", ");
-        buf.append("userpart: ");
-        buf.append(config.getUserPart()).append(", ");
-        buf.append("domain: ");
-        buf.append(config.getDomain()).append("]");
-        logger.info(buf.toString());
+
+        String information = "starting user agent [" +
+                "myAddress: " +
+                config.getLocalInetAddress().getHostAddress() + ", " +
+                "sipPort: " +
+                config.getSipPort() + ", " +
+                "userpart: " +
+                config.getUserPart() + ", " +
+                "domain: " +
+                config.getDomain() + "]";
+        logger.info(information);
 
         //transaction user
         

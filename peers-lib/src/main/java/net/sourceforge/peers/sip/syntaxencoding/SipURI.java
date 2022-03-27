@@ -46,7 +46,7 @@ public class SipURI {
     public SipURI(String sipUri)
             throws SipUriSyntaxException {
         stringRepresentation = sipUri;
-        StringBuffer buf = new StringBuffer(sipUri);
+        StringBuilder buf = new StringBuilder(sipUri);
         String scheme = RFC3261.SIP_SCHEME + RFC3261.SCHEME_SEPARATOR;
         if (!sipUri.startsWith(scheme)) {
             throw new SipUriSyntaxException("SIP URI must start with " + scheme);
@@ -87,7 +87,7 @@ public class SipURI {
         if (buf.length() <= 0) {
             return;
         }
-        uriParameters = new Hashtable<String, String>();
+        uriParameters = new Hashtable<>();
         while (buf.length() > 0) {
             buf.deleteCharAt(0);//delete the first ';'
             int nextSemicolon = buf.indexOf(";");

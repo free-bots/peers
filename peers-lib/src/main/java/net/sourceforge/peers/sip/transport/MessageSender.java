@@ -19,14 +19,14 @@
 
 package net.sourceforge.peers.sip.transport;
 
+import net.sourceforge.peers.Config;
+import net.sourceforge.peers.Logger;
+import net.sourceforge.peers.Timer;
+import net.sourceforge.peers.sip.RFC3261;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.TimerTask;
-
-import net.sourceforge.peers.Timer;
-import net.sourceforge.peers.Config;
-import net.sourceforge.peers.Logger;
-import net.sourceforge.peers.sip.RFC3261;
 
 
 public abstract class MessageSender {
@@ -40,10 +40,10 @@ public abstract class MessageSender {
     private String transportName;
     private Timer timer;
     protected Logger logger;
-    
-    public MessageSender(int localPort, InetAddress inetAddress,
-            int port, Config config,
-            String transportName, Logger logger) {
+
+    protected MessageSender(int localPort, InetAddress inetAddress,
+                            int port, Config config,
+                            String transportName, Logger logger) {
         super();
         this.localPort = localPort;
         this.inetAddress = inetAddress;
@@ -51,31 +51,32 @@ public abstract class MessageSender {
         this.config = config;
         this.transportName = transportName;
         timer = new Timer(getClass().getSimpleName() + " "
-            + Timer.class.getSimpleName());
+                + Timer.class.getSimpleName());
         this.logger = logger;
         //TODO check config
         timer.scheduleAtFixedRate(new KeepAlive(), 0,
                 1000 * KEEY_ALIVE_INTERVAL);
     }
-    
+
     public abstract void sendMessage(SipMessage sipMessage) throws IOException;
+
     public abstract void sendBytes(byte[] bytes) throws IOException;
 
     public String getContact() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder builder = new StringBuilder();
         InetAddress myAddress = config.getPublicInetAddress();
         if (myAddress == null) {
             myAddress = config.getLocalInetAddress();
         }
-        buf.append(myAddress.getHostAddress());
-        buf.append(RFC3261.TRANSPORT_PORT_SEP);
-        //buf.append(config.getSipPort());
-        buf.append(localPort);
-        buf.append(RFC3261.PARAM_SEPARATOR);
-        buf.append(RFC3261.PARAM_TRANSPORT);
-        buf.append(RFC3261.PARAM_ASSIGNMENT);
-        buf.append(transportName);
-        return buf.toString();
+        builder.append(myAddress.getHostAddress());
+        builder.append(RFC3261.TRANSPORT_PORT_SEP);
+        //builder.append(config.getSipPort());
+        builder.append(localPort);
+        builder.append(RFC3261.PARAM_SEPARATOR);
+        builder.append(RFC3261.PARAM_TRANSPORT);
+        builder.append(RFC3261.PARAM_ASSIGNMENT);
+        builder.append(transportName);
+        return builder.toString();
     }
 
     public int getLocalPort() {

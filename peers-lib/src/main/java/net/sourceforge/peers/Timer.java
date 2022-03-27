@@ -27,26 +27,32 @@ public class Timer extends java.util.Timer {
         super(name, isDaemon);
     }
 
+    @Override
     public void schedule(TimerTask task, long delay) {
         callIgnoreIllegalStateTransaction(() -> { super.schedule(task, delay); return true; });
     }
 
+    @Override
     public void schedule(TimerTask task, Date time) {
         callIgnoreIllegalStateTransaction(() -> { super.schedule(task, time); return true; });
     }
 
+    @Override
     public void schedule(TimerTask task, long delay, long period) {
         callIgnoreIllegalStateTransaction(() -> { super.schedule(task, delay, period); return true; });
     }
 
+    @Override
     public void schedule(TimerTask task, Date firstTime, long period) {
         callIgnoreIllegalStateTransaction(() -> { super.schedule(task, firstTime, period); return true; });
     }
 
+    @Override
     public void scheduleAtFixedRate(TimerTask task, long delay, long period) {
         callIgnoreIllegalStateTransaction(() -> { super.scheduleAtFixedRate(task, delay, period); return true; });
     }
 
+    @Override
     public void scheduleAtFixedRate(TimerTask task, Date firstTime, long period) {
         callIgnoreIllegalStateTransaction(() -> { super.scheduleAtFixedRate(task, firstTime, period); return true; });
     }

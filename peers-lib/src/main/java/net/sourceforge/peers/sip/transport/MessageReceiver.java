@@ -52,7 +52,7 @@ public abstract class MessageReceiver implements Runnable {
     private Config config;
     protected Logger logger;
 
-    public MessageReceiver(int port, TransactionManager transactionManager,
+    protected MessageReceiver(int port, TransactionManager transactionManager,
             TransportManager transportManager, Config config, Logger logger) {
         super();
         this.port = port;
@@ -83,10 +83,7 @@ public abstract class MessageReceiver implements Runnable {
         } catch (UnsupportedEncodingException e) {
             logger.error("unsupported encoding", e);
         }
-        if (RFC3261.DEFAULT_SIP_VERSION.equals(beginning)) {
-            return false;
-        }
-        return true;
+        return !RFC3261.DEFAULT_SIP_VERSION.equals(beginning);
     }
     
     protected void processMessage(byte[] message, InetAddress sourceIp,

@@ -31,9 +31,9 @@ import net.sourceforge.peers.sip.Utils;
 
 public class FileLogger implements Logger {
 
-    public final static String LOG_FILE = File.separator + "logs"
+    public static final String LOG_FILE = File.separator + "logs"
         + File.separator + "peers.log";
-    public final static String NETWORK_FILE = File.separator + "logs"
+    public static final String NETWORK_FILE = File.separator + "logs"
         + File.separator + "transport.log";
 
     private PrintWriter logWriter;
@@ -66,7 +66,7 @@ public class FileLogger implements Logger {
     @Override
     public final void debug(String message) {
         synchronized (logMutex) {
-            logWriter.write(genericLog(message.toString(), "DEBUG"));
+            logWriter.write(genericLog(message, "DEBUG"));
             logWriter.flush();
         }
     }
@@ -74,7 +74,7 @@ public class FileLogger implements Logger {
     @Override
     public final void info(String message) {
         synchronized (logMutex) {
-            logWriter.write(genericLog(message.toString(), "INFO "));
+            logWriter.write(genericLog(message, "INFO "));
             logWriter.flush();
         }
     }
@@ -82,7 +82,7 @@ public class FileLogger implements Logger {
     @Override
     public final void error(String message) {
         synchronized (logMutex) {
-            logWriter.write(genericLog(message.toString(), "ERROR"));
+            logWriter.write(genericLog(message, "ERROR"));
             logWriter.flush();
         }
     }
@@ -112,16 +112,15 @@ public class FileLogger implements Logger {
     @Override
     public final void traceNetwork(String message, String direction) {
         synchronized (networkMutex) {
-            StringBuffer buf = new StringBuffer();
-            buf.append(networkFormatter.format(new Date()));
-            buf.append(" ");
-            buf.append(direction);
-            buf.append(" [");
-            buf.append(Thread.currentThread().getName());
-            buf.append("]\n\n");
-            buf.append(message);
-            buf.append("\n");
-            networkWriter.write(buf.toString());
+            String formattedMessage = networkFormatter.format(new Date()) +
+                    " " +
+                    direction +
+                    " [" +
+                    Thread.currentThread().getName() +
+                    "]\n\n" +
+                    message +
+                    "\n";
+            networkWriter.write(formattedMessage);
             networkWriter.flush();
         }
     }

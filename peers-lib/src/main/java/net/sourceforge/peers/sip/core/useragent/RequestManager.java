@@ -21,18 +21,8 @@ package net.sourceforge.peers.sip.core.useragent;
 
 import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
-import net.sourceforge.peers.sip.core.useragent.handlers.ByeHandler;
-import net.sourceforge.peers.sip.core.useragent.handlers.CancelHandler;
-import net.sourceforge.peers.sip.core.useragent.handlers.InviteHandler;
-import net.sourceforge.peers.sip.core.useragent.handlers.OptionsHandler;
-import net.sourceforge.peers.sip.core.useragent.handlers.RegisterHandler;
-import net.sourceforge.peers.sip.syntaxencoding.NameAddress;
-import net.sourceforge.peers.sip.syntaxencoding.SipHeaderFieldName;
-import net.sourceforge.peers.sip.syntaxencoding.SipHeaderFieldValue;
-import net.sourceforge.peers.sip.syntaxencoding.SipHeaderParamName;
-import net.sourceforge.peers.sip.syntaxencoding.SipHeaders;
-import net.sourceforge.peers.sip.syntaxencoding.SipURI;
-import net.sourceforge.peers.sip.syntaxencoding.SipUriSyntaxException;
+import net.sourceforge.peers.sip.core.useragent.handlers.*;
+import net.sourceforge.peers.sip.syntaxencoding.*;
 import net.sourceforge.peers.sip.transaction.TransactionManager;
 import net.sourceforge.peers.sip.transactionuser.Dialog;
 import net.sourceforge.peers.sip.transactionuser.DialogManager;
@@ -44,7 +34,7 @@ import net.sourceforge.peers.sip.transport.TransportManager;
 public abstract class RequestManager {
 
     public static SipURI getDestinationUri(SipRequest sipRequest,
-            Logger logger) {
+                                           Logger logger) {
         SipHeaders requestHeaders = sipRequest.getSipHeaders();
         SipURI destinationUri = null;
         SipHeaderFieldValue route = requestHeaders.get(
@@ -64,7 +54,7 @@ public abstract class RequestManager {
     }
 
     public static SipResponse generateResponse(SipRequest sipRequest,
-            Dialog dialog, int statusCode, String reasonPhrase) {
+                                               Dialog dialog, int statusCode, String reasonPhrase) {
         //8.2.6.2
         SipResponse sipResponse = new SipResponse(statusCode, reasonPhrase);
         SipHeaders requestHeaders = sipRequest.getSipHeaders();
@@ -96,22 +86,22 @@ public abstract class RequestManager {
     protected ByeHandler byeHandler;
     protected OptionsHandler optionsHandler;
     protected RegisterHandler registerHandler;
-    
+
     protected UserAgent userAgent;
     protected TransactionManager transactionManager;
     protected TransportManager transportManager;
     protected Logger logger;
-    
-    public RequestManager(UserAgent userAgent,
-            InviteHandler inviteHandler,
-            CancelHandler cancelHandler,
-            ByeHandler byeHandler,
-            OptionsHandler optionsHandler,
-            RegisterHandler registerHandler,
-            DialogManager dialogManager,
-            TransactionManager transactionManager,
-            TransportManager transportManager,
-            Logger logger) {
+
+    protected RequestManager(UserAgent userAgent,
+                             InviteHandler inviteHandler,
+                             CancelHandler cancelHandler,
+                             ByeHandler byeHandler,
+                             OptionsHandler optionsHandler,
+                             RegisterHandler registerHandler,
+                             DialogManager dialogManager,
+                             TransactionManager transactionManager,
+                             TransportManager transportManager,
+                             Logger logger) {
         this.userAgent = userAgent;
         this.inviteHandler = inviteHandler;
         this.cancelHandler = cancelHandler;

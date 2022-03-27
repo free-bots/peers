@@ -20,7 +20,7 @@ package net.sourceforge.peers.media;
 
 public abstract class AbstractSoundManager implements SoundSource {
 
-    public final static String MEDIA_DIR = "media";
+    public static final String MEDIA_DIR = "media";
 
     public abstract void init();
     public abstract void close();

@@ -262,7 +262,7 @@ public class InitialRequestManager extends RequestManager
                     this, sipRequest);
             serverTransaction.start();
             serverTransaction.receivedRequest(sipRequest);
-            serverTransaction.sendReponse(sipResponse);
+            serverTransaction.sendResponse(sipResponse);
         }
         
         //TODO create server transaction
@@ -284,15 +284,15 @@ public class InitialRequestManager extends RequestManager
         
         //Contact
         
-        StringBuffer contactBuf = new StringBuffer();
-        contactBuf.append(RFC3261.SIP_SCHEME);
-        contactBuf.append(RFC3261.SCHEME_SEPARATOR);
+        StringBuilder contactBuilder = new StringBuilder();
+        contactBuilder.append(RFC3261.SIP_SCHEME);
+        contactBuilder.append(RFC3261.SCHEME_SEPARATOR);
         String userPart = Utils.getUserPart(profileUri);
-        contactBuf.append(userPart);
-        contactBuf.append(RFC3261.AT);
-        contactBuf.append(contactEnd);
+        contactBuilder.append(userPart);
+        contactBuilder.append(RFC3261.AT);
+        contactBuilder.append(contactEnd);
 
-        NameAddress contactNA = new NameAddress(contactBuf.toString());
+        NameAddress contactNA = new NameAddress(contactBuilder.toString());
         SipHeaderFieldValue contact =
             new SipHeaderFieldValue(contactNA.toString());
         sipHeaders.add(new SipHeaderFieldName(RFC3261.HDR_CONTACT),

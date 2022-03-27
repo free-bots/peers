@@ -104,18 +104,13 @@ public class UAC {
         if (getInitialRequestManager().getRegisterHandler().isRegistered()) {
             String requestUri = RFC3261.SIP_SCHEME + RFC3261.SCHEME_SEPARATOR
                 + userAgent.getDomain();
-            MessageInterceptor messageInterceptor = new MessageInterceptor() {
-                
-                @Override
-                public void postProcess(SipMessage sipMessage) {
-                    initialRequestManager.registerHandler.unregister();
-                    SipHeaders sipHeaders = sipMessage.getSipHeaders();
-                    SipHeaderFieldValue contact = sipHeaders.get(
-                            new SipHeaderFieldName(RFC3261.HDR_CONTACT));
-                    contact.addParam(new SipHeaderParamName(RFC3261.PARAM_EXPIRES),
-                            "0");
-                }
-                
+            MessageInterceptor messageInterceptor = sipMessage -> {
+                initialRequestManager.registerHandler.unregister();
+                SipHeaders sipHeaders = sipMessage.getSipHeaders();
+                SipHeaderFieldValue contact = sipHeaders.get(
+                        new SipHeaderFieldName(RFC3261.HDR_CONTACT));
+                contact.addParam(new SipHeaderParamName(RFC3261.PARAM_EXPIRES),
+                        "0");
             };
             // for any reason, asterisk requires a new Call-ID to unregister
             registerCallID = Utils.generateCallID(

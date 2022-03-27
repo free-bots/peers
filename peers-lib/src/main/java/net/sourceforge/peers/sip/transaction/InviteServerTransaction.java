@@ -99,7 +99,7 @@ public class InviteServerTransaction extends InviteTransaction
         
     }
 
-    public void sendReponse(SipResponse sipResponse) {
+    public void sendResponse(SipResponse sipResponse) {
         //TODO check that a retransmission response will be considered as
         //equal (for contains) to the first response
         if (!responses.contains(sipResponse)) {

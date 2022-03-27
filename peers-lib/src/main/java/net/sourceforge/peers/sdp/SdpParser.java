@@ -117,7 +117,7 @@ public class SdpParser {
 		}
 		//we are at the first media line
         
-        ArrayList<SdpLine> mediaLines = new ArrayList<SdpLine>();
+        ArrayList<SdpLine> mediaLines = new ArrayList<>();
         do {
             if (line.length() < 3) {
                 return null;
@@ -132,21 +132,21 @@ public class SdpParser {
         }
         while ((line = reader.readLine()) != null);
         
-        ArrayList<MediaDescription> mediaDescriptions = new ArrayList<MediaDescription>();
+        ArrayList<MediaDescription> mediaDescriptions = new ArrayList<>();
         sessionDescription.setMediaDescriptions(mediaDescriptions);
         
         for (SdpLine sdpLine : mediaLines) {
             MediaDescription mediaDescription;
             if (sdpLine.getType() == RFC4566.TYPE_MEDIA) {
                 String[] mediaArr = sdpLine.getValue().split(" ");
-                if (mediaArr == null || mediaArr.length < 4) {
+                if (mediaArr.length < 4) {
                     return null;
                 }
                 mediaDescription = new MediaDescription();
                 mediaDescription.setType(mediaArr[0]);
                 //TODO manage port range
                 mediaDescription.setPort(Integer.parseInt(mediaArr[1]));
-                mediaDescription.setAttributes(new Hashtable<String, String>());
+                mediaDescription.setAttributes(new Hashtable<>());
                 List<Codec> codecs = new ArrayList<Codec>();
                 for (int i = 3; i < mediaArr.length; ++i) {
                     int payloadType = Integer.parseInt(mediaArr[i]);
@@ -227,7 +227,7 @@ public class SdpParser {
 	
 	private String parseConnection(String line) {
 		String[] connectionArr = line.split(" ");
-		if (connectionArr == null || connectionArr.length != 3) {
+		if (connectionArr.length != 3) {
 			return null;
 		}
 		return connectionArr[2];

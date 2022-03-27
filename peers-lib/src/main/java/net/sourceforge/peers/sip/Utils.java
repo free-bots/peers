@@ -35,7 +35,10 @@ public class Utils {
     public static final String PEERSHOME_SYSTEM_PROPERTY = "peers.home";
     public static final String DEFAULT_PEERS_HOME = ".";
 
-    public final static SipHeaderFieldValue getTopVia(SipMessage sipMessage) {
+    private Utils() {
+    }
+
+    public static SipHeaderFieldValue getTopVia(SipMessage sipMessage) {
         SipHeaders sipHeaders = sipMessage.getSipHeaders();
         SipHeaderFieldName viaName = new SipHeaderFieldName(RFC3261.HDR_VIA);
         SipHeaderFieldValue via = sipHeaders.get(viaName);
@@ -44,31 +47,27 @@ public class Utils {
         }
         return via;
     }
-    
-    public final static String generateTag() {
+
+    public static String generateTag() {
         return randomString(8);
     }
-    
-    public final static String generateCallID(InetAddress inetAddress) {
+
+    public static String generateCallID(InetAddress inetAddress) {
         //TODO make a hash using current time millis, public ip @, private @, and a random string
-        StringBuffer buf = new StringBuffer();
-        buf.append(randomString(8));
-        buf.append('-');
-        buf.append(String.valueOf(System.currentTimeMillis()));
-        buf.append('@');
-        buf.append(inetAddress.getHostName());
-        return buf.toString();
+        return randomString(8) +
+                '-' +
+                String.valueOf(System.currentTimeMillis()) +
+                '@' +
+                inetAddress.getHostName();
     }
     
-    public final static String generateBranchId() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(RFC3261.BRANCHID_MAGIC_COOKIE);
-        //TODO must be unique across space and time...
-        buf.append(randomString(9));
-        return buf.toString();
+    public static String generateBranchId() {
+        return RFC3261.BRANCHID_MAGIC_COOKIE +
+                //TODO must be unique across space and time...
+                randomString(9);
     }
     
-    public final static String getMessageCallId(SipMessage sipMessage) {
+    public static String getMessageCallId(SipMessage sipMessage) {
         if (sipMessage == null || sipMessage.getSipHeaders() == null) return null;
         SipHeaderFieldValue callId = sipMessage.getSipHeaders().get(
                 new SipHeaderFieldName(RFC3261.HDR_CALLID));
@@ -76,11 +75,11 @@ public class Utils {
         return callId.getValue();
     }
     
-    public final static String randomString(int length) {
+    public static String randomString(int length) {
         String chars = "abcdefghijklmnopqrstuvwxyz" +
                        "ABCDEFGHIFKLMNOPRSTUVWXYZ" +
                        "0123456789";
-        StringBuffer buf = new StringBuffer(length);
+        StringBuilder buf = new StringBuilder(length);
         for (int i = 0; i < length; ++i) {
             int pos = (int)Math.round(Math.random() * (chars.length() - 1));
             buf.append(chars.charAt(pos));
@@ -88,7 +87,7 @@ public class Utils {
         return buf.toString();
     }
     
-    public final static void copyHeader(SipMessage src, SipMessage dst, String name) {
+    public static void copyHeader(SipMessage src, SipMessage dst, String name) {
         SipHeaderFieldName sipHeaderFieldName = new SipHeaderFieldName(name);
         SipHeaderFieldValue sipHeaderFieldValue = src.getSipHeaders().get(sipHeaderFieldName);
         if (sipHeaderFieldValue != null) {
@@ -96,7 +95,7 @@ public class Utils {
         }
     }
     
-    public final static String getUserPart(String sipUri) {
+    public static String getUserPart(String sipUri) {
         int start = sipUri.indexOf(RFC3261.SCHEME_SEPARATOR);
         int end = sipUri.indexOf(RFC3261.AT);
         return sipUri.substring(start + 1, end);
@@ -106,7 +105,7 @@ public class Utils {
      * adds Max-Forwards Supported and Require headers
      * @param headers
      */
-    public final static void addCommonHeaders(SipHeaders headers) {
+    public static void addCommonHeaders(SipHeaders headers) {
         //Max-Forwards
         
         headers.add(new SipHeaderFieldName(RFC3261.HDR_MAX_FORWARDS),
@@ -116,8 +115,8 @@ public class Utils {
         //TODO Supported and Require
     }
 
-    public final static String generateAllowHeader() {
-        StringBuffer buf = new StringBuffer();
+    public static String generateAllowHeader() {
+        StringBuilder buf = new StringBuilder();
         for (String supportedMethod: UAS.SUPPORTED_METHODS) {
             buf.append(supportedMethod);
             buf.append(", ");

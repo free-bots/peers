@@ -86,7 +86,7 @@ public class NonInviteServerTransaction extends NonInviteTransaction
         state.receivedRequest();
     }
 
-    public void sendReponse(SipResponse sipResponse) {
+    public void sendResponse(SipResponse sipResponse) {
         responses.add(sipResponse);
         int statusCode = sipResponse.getStatusCode();
         if (statusCode < RFC3261.CODE_200_OK) {

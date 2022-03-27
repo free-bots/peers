@@ -44,7 +44,7 @@ public abstract class MethodHandler {
     protected boolean challenged;
     protected Logger logger;
     
-    public MethodHandler(UserAgent userAgent,
+    protected MethodHandler(UserAgent userAgent,
             TransactionManager transactionManager,
             TransportManager transportManager, Logger logger) {
         this.userAgent = userAgent;

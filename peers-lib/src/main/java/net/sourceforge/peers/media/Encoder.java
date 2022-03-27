@@ -44,7 +44,7 @@ public abstract class Encoder implements Runnable {
     private String peersHome;
     private CountDownLatch latch;
 
-    public Encoder(PipedInputStream rawData, PipedOutputStream encodedData,
+    protected Encoder(PipedInputStream rawData, PipedOutputStream encodedData,
             boolean mediaDebug, Logger logger, String peersHome,
             CountDownLatch latch) {
         this.rawData = rawData;

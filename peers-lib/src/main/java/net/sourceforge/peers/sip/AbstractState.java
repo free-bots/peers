@@ -26,18 +26,17 @@ public abstract class AbstractState {
     protected String id;
     protected Logger logger;
     
-    public AbstractState(String id, Logger logger) {
+    protected AbstractState(String id, Logger logger) {
         this.id = id;
         this.logger = logger;
     }
 
     public void log(AbstractState state) {
-        StringBuffer buf = new StringBuffer();
-        buf.append("SM ").append(id).append(" [");
-        buf.append(JavaUtils.getShortClassName(this.getClass())).append(" -> ");
-        buf.append(JavaUtils.getShortClassName(state.getClass())).append("] ");
-        buf.append(new Exception().getStackTrace()[1].getMethodName());
-        logger.debug(buf.toString());
+        String buf = "SM " + id + " [" +
+                JavaUtils.getShortClassName(this.getClass()) + " -> " +
+                JavaUtils.getShortClassName(state.getClass()) + "] " +
+                new Exception().getStackTrace()[1].getMethodName();
+        logger.debug(buf);
     }
     
 }

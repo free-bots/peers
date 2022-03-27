@@ -19,6 +19,11 @@
 
 package net.sourceforge.peers.sdp;
 
+import net.sourceforge.peers.Config;
+import net.sourceforge.peers.Logger;
+import net.sourceforge.peers.rtp.RFC3551;
+import net.sourceforge.peers.sip.core.useragent.UserAgent;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -26,21 +31,15 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
 
-import net.sourceforge.peers.Config;
-import net.sourceforge.peers.Logger;
-import net.sourceforge.peers.rtp.RFC3551;
-import net.sourceforge.peers.rtp.RFC4733;
-import net.sourceforge.peers.sip.core.useragent.UserAgent;
-
 public class SDPManager {
-    
-    private SdpParser sdpParser;
-    private UserAgent userAgent;
-    private List<Codec> supportedCodecs;
-    private Random random;
 
-    private Logger logger;
-    
+    private final SdpParser sdpParser;
+    private final UserAgent userAgent;
+    private final List<Codec> supportedCodecs;
+    private final Random random;
+
+    private final Logger logger;
+
     public SDPManager(UserAgent userAgent, Logger logger) {
         this.userAgent = userAgent;
         this.logger = logger;
@@ -48,7 +47,7 @@ public class SDPManager {
         supportedCodecs = userAgent.getConfig().getSupportedCodecs();
         random = new Random();
     }
-    
+
     public SessionDescription parse(byte[] sdp) {
         try {
             return sdpParser.parse(sdp);
@@ -62,9 +61,9 @@ public class SDPManager {
             SessionDescription sessionDescription) throws NoCodecException {
         InetAddress destAddress = sessionDescription.getIpAddress();
         List<MediaDescription> mediaDescriptions = sessionDescription.getMediaDescriptions();
-        for (MediaDescription mediaDescription: mediaDescriptions) {
+        for (MediaDescription mediaDescription : mediaDescriptions) {
             if (RFC4566.MEDIA_AUDIO.equals(mediaDescription.getType())) {
-                for (Codec offerCodec: mediaDescription.getCodecs()) {
+                for (Codec offerCodec : mediaDescription.getCodecs()) {
                     if (supportedCodecs.contains(offerCodec)) {
                         String offerCodecName = offerCodec.getName();
                         if (offerCodecName.equalsIgnoreCase(RFC3551.PCMU) ||
@@ -74,7 +73,7 @@ public class SDPManager {
                                 destAddress = mediaDescription.getIpAddress();
                             }
                             MediaDestination mediaDestination =
-                                new MediaDestination();
+                                    new MediaDestination();
                             mediaDestination.setDestination(
                                     destAddress.getHostAddress());
                             mediaDestination.setPort(destPort);
@@ -89,7 +88,7 @@ public class SDPManager {
     }
 
     public SessionDescription createSessionDescription(SessionDescription offer,
-            int localRtpPort)
+                                                       int localRtpPort)
             throws IOException {
         SessionDescription sessionDescription = new SessionDescription();
         sessionDescription.setUsername("user1");
@@ -102,16 +101,16 @@ public class SDPManager {
         }
         sessionDescription.setIpAddress(inetAddress);
         sessionDescription.setName("-");
-        sessionDescription.setAttributes(new Hashtable<String, String>());
+        sessionDescription.setAttributes(new Hashtable<>());
         List<Codec> codecs;
         if (offer == null) {
             codecs = supportedCodecs;
         } else {
-            codecs = new ArrayList<Codec>();
-            for (MediaDescription mediaDescription:
+            codecs = new ArrayList<>();
+            for (MediaDescription mediaDescription :
                     offer.getMediaDescriptions()) {
                 if (RFC4566.MEDIA_AUDIO.equals(mediaDescription.getType())) {
-                    for (Codec codec: mediaDescription.getCodecs()) {
+                    for (Codec codec : mediaDescription.getCodecs()) {
                         if (supportedCodecs.contains(codec)) {
                             codecs.add(codec);
                         }
@@ -120,14 +119,14 @@ public class SDPManager {
             }
         }
         MediaDescription mediaDescription = new MediaDescription();
-        Hashtable<String, String> attributes = new Hashtable<String, String>();
+        Hashtable<String, String> attributes = new Hashtable<>();
         attributes.put(RFC4566.ATTR_SENDRECV, "");
         mediaDescription.setAttributes(attributes);
         mediaDescription.setType(RFC4566.MEDIA_AUDIO);
         mediaDescription.setPort(localRtpPort);
         mediaDescription.setCodecs(codecs);
         List<MediaDescription> mediaDescriptions =
-            new ArrayList<MediaDescription>();
+                new ArrayList<>();
         mediaDescriptions.add(mediaDescription);
         sessionDescription.setMediaDescriptions(mediaDescriptions);
         return sessionDescription;

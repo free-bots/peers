@@ -70,7 +70,7 @@ public class OptionsHandler extends MethodHandler
                 this, sipRequest);
         serverTransaction.start();
         serverTransaction.receivedRequest(sipRequest);
-        serverTransaction.sendReponse(sipResponse);
+        serverTransaction.sendResponse(sipResponse);
     }
 
     @Override

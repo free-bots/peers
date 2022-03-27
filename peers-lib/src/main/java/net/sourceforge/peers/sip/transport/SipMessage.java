@@ -30,7 +30,7 @@ public abstract class SipMessage {
     protected SipHeaders sipHeaders;
     protected byte[] body;
 
-    public SipMessage() {
+    protected SipMessage() {
         sipVersion = RFC3261.DEFAULT_SIP_VERSION;
         sipHeaders = new SipHeaders();
     }
@@ -68,7 +68,7 @@ public abstract class SipMessage {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(sipHeaders.toString());
         buf.append(RFC3261.CRLF);
         if (body != null) {

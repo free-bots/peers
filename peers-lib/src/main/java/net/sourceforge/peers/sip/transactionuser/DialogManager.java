@@ -34,12 +34,12 @@ import net.sourceforge.peers.sip.transport.SipResponse;
 
 public class DialogManager {
     
-    private Hashtable<String, Dialog> dialogs;
+    private final Hashtable<String, Dialog> dialogs;
     private Logger logger;
     
     public DialogManager(Logger logger) {
         this.logger = logger;
-        dialogs = new Hashtable<String, Dialog>();
+        dialogs = new Hashtable<>();
     }
 
     /**
@@ -101,13 +101,11 @@ public class DialogManager {
     }
     
     private String getDialogId(String callID, String localTag, String remoteTag) {
-        StringBuffer buf = new StringBuffer();
-        buf.append(callID);
-        buf.append(Dialog.ID_SEPARATOR);
-        buf.append(localTag);
-        buf.append(Dialog.ID_SEPARATOR);
-        buf.append(remoteTag);
-        return buf.toString();
+        return callID +
+                Dialog.ID_SEPARATOR +
+                localTag +
+                Dialog.ID_SEPARATOR +
+                remoteTag;
     }
     
     public Collection<Dialog> getDialogCollection() {

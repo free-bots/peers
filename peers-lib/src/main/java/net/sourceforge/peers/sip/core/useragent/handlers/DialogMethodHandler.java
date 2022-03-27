@@ -19,20 +19,10 @@
 
 package net.sourceforge.peers.sip.core.useragent.handlers;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.TimerTask;
-
 import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.sip.RFC3261;
 import net.sourceforge.peers.sip.core.useragent.UserAgent;
-import net.sourceforge.peers.sip.syntaxencoding.NameAddress;
-import net.sourceforge.peers.sip.syntaxencoding.SipHeaderFieldMultiValue;
-import net.sourceforge.peers.sip.syntaxencoding.SipHeaderFieldName;
-import net.sourceforge.peers.sip.syntaxencoding.SipHeaderFieldValue;
-import net.sourceforge.peers.sip.syntaxencoding.SipHeaderParamName;
-import net.sourceforge.peers.sip.syntaxencoding.SipHeaders;
+import net.sourceforge.peers.sip.syntaxencoding.*;
 import net.sourceforge.peers.sip.transaction.Transaction;
 import net.sourceforge.peers.sip.transaction.TransactionManager;
 import net.sourceforge.peers.sip.transactionuser.Dialog;
@@ -41,52 +31,57 @@ import net.sourceforge.peers.sip.transport.SipRequest;
 import net.sourceforge.peers.sip.transport.SipResponse;
 import net.sourceforge.peers.sip.transport.TransportManager;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.TimerTask;
+
 
 public abstract class DialogMethodHandler extends MethodHandler {
 
     protected DialogManager dialogManager;
-    
-    public DialogMethodHandler(UserAgent userAgent,
-            DialogManager dialogManager,
-            TransactionManager transactionManager,
-            TransportManager transportManager, Logger logger) {
+
+    protected DialogMethodHandler(UserAgent userAgent,
+                                  DialogManager dialogManager,
+                                  TransactionManager transactionManager,
+                                  TransportManager transportManager, Logger logger) {
         super(userAgent, transactionManager, transportManager, logger);
         this.dialogManager = dialogManager;
     }
-    
+
     protected Dialog buildDialogForUas(SipResponse sipResponse,
-            SipRequest sipRequest) {
+                                       SipRequest sipRequest) {
         //12.1.1
-        
+
         //prepare response
-        
+
         SipHeaders reqHeaders = sipRequest.getSipHeaders();
         SipHeaders respHeaders = sipResponse.getSipHeaders();
-        
-          //copy record-route
+
+        //copy record-route
         SipHeaderFieldName recordRouteName =
-            new SipHeaderFieldName(RFC3261.HDR_RECORD_ROUTE);
+                new SipHeaderFieldName(RFC3261.HDR_RECORD_ROUTE);
         SipHeaderFieldValue reqRecRoute = reqHeaders.get(recordRouteName);
         if (reqRecRoute != null) {
-        	respHeaders.add(recordRouteName, reqRecRoute);
+            respHeaders.add(recordRouteName, reqRecRoute);
         }
 
         //FIXME Contact header should probably added in response here.
 
         SipHeaderFieldName contactName = new SipHeaderFieldName(RFC3261.HDR_CONTACT);
-        
+
         Dialog dialog = dialogManager.createDialog(sipResponse);
-        
+
         //build dialog state
-        
-          //route set
+
+        //route set
         SipHeaderFieldValue recordRoute =
-            respHeaders.get(new SipHeaderFieldName(RFC3261.HDR_RECORD_ROUTE));
+                respHeaders.get(new SipHeaderFieldName(RFC3261.HDR_RECORD_ROUTE));
         ArrayList<String> routeSet = new ArrayList<String>();
         if (recordRoute != null) {
             if (recordRoute instanceof SipHeaderFieldMultiValue) {
                 SipHeaderFieldMultiValue multiRecordRoute =
-                    (SipHeaderFieldMultiValue) recordRoute;
+                        (SipHeaderFieldMultiValue) recordRoute;
                 for (SipHeaderFieldValue routeValue : multiRecordRoute.getValues()) {
                     routeSet.add(routeValue.getValue());
                 }
@@ -95,120 +90,120 @@ public abstract class DialogMethodHandler extends MethodHandler {
             }
         }
         dialog.setRouteSet(routeSet);
-        
-          //remote target
+
+        //remote target
         SipHeaderFieldValue reqContact = reqHeaders.get(contactName);
         String remoteTarget = reqContact.getValue();
         if (remoteTarget.indexOf(RFC3261.LEFT_ANGLE_BRACKET) > -1) {
             remoteTarget = NameAddress.nameAddressToUri(remoteTarget);
         }
         dialog.setRemoteTarget(remoteTarget);
-        
-          //remote cseq
+
+        //remote cseq
         SipHeaderFieldName cseqName = new SipHeaderFieldName(RFC3261.HDR_CSEQ);
         SipHeaderFieldValue cseq = reqHeaders.get(cseqName);
         String remoteCseq = cseq.getValue().substring(0, cseq.getValue().indexOf(' '));
         dialog.setRemoteCSeq(Integer.parseInt(remoteCseq));
-        
-          //callid
+
+        //callid
         SipHeaderFieldName callidName = new SipHeaderFieldName(RFC3261.HDR_CALLID);
         SipHeaderFieldValue callid = reqHeaders.get(callidName);
         dialog.setCallId(callid.getValue());
-        
-          //local tag
+
+        //local tag
         SipHeaderFieldName toName = new SipHeaderFieldName(RFC3261.HDR_TO);
         SipHeaderFieldValue to = respHeaders.get(toName);
         SipHeaderParamName tagName = new SipHeaderParamName(RFC3261.PARAM_TAG);
         String toTag = to.getParam(tagName);
         dialog.setLocalTag(toTag);
-        
-          //remote tag
+
+        //remote tag
         SipHeaderFieldName fromName = new SipHeaderFieldName(RFC3261.HDR_FROM);
         SipHeaderFieldValue from = reqHeaders.get(fromName);
         String fromTag = from.getParam(tagName);
         dialog.setRemoteTag(fromTag);
-        
-          //remote uri
-        
+
+        //remote uri
+
         String remoteUri = from.getValue();
         if (remoteUri.indexOf(RFC3261.LEFT_ANGLE_BRACKET) > -1) {
             remoteUri = NameAddress.nameAddressToUri(remoteUri);
         }
         dialog.setRemoteUri(remoteUri);
-        
-          //local uri
-        
+
+        //local uri
+
         String localUri = to.getValue();
         if (localUri.indexOf(RFC3261.LEFT_ANGLE_BRACKET) > -1) {
             localUri = NameAddress.nameAddressToUri(localUri);
         }
         dialog.setLocalUri(localUri);
-        
+
         return dialog;
     }
-    
+
     //TODO throw an exception if dialog elements are lacking when dialog is built from 200
     protected Dialog buildOrUpdateDialogForUac(SipResponse sipResponse,
-            Transaction transaction) {
+                                               Transaction transaction) {
         SipHeaders headers = sipResponse.getSipHeaders();
-        
+
         Dialog dialog = dialogManager.getDialog(sipResponse);
         if (dialog == null) {
             dialog = dialogManager.createDialog(sipResponse);
         }
-        
+
         //12.1.2
-        
+
         //TODO if request uri contains sips scheme or if sent over tls => dialog.setSecure(true)
-        
+
         //route set
-        
+
         ArrayList<String> routeSet = computeRouteSet(headers);
         if (routeSet != null) {
             dialog.setRouteSet(routeSet);
         }
-        
+
         //remote target
-        
+
         SipHeaderFieldValue contact = headers.get(new SipHeaderFieldName(RFC3261.HDR_CONTACT));
         logger.debug("Contact: " + contact);
         if (contact != null) {
             String remoteTarget = NameAddress.nameAddressToUri(contact.toString());
             dialog.setRemoteTarget(remoteTarget);
         }
-        
+
         SipHeaders requestSipHeaders = transaction.getRequest().getSipHeaders();
-        
+
         //local cseq
-        
+
         String requestCSeq = requestSipHeaders.get(
                 new SipHeaderFieldName(RFC3261.HDR_CSEQ)).toString();
         requestCSeq = requestCSeq.substring(0, requestCSeq.indexOf(' '));
         dialog.setLocalCSeq(Integer.parseInt(requestCSeq));
-        
+
         //callID
-        
+
         //already done in createDialog()
 //        String requestCallID = requestSipHeaders.get(
 //                new SipHeaderFieldName(RFC3261.HDR_CALLID)).toString();
 //        dialog.setCallId(requestCallID);
-        
+
         //local tag
-        
+
         //already done in createDialog()
 //        SipHeaderFieldValue requestFrom = requestSipHeaders.get(
 //                new SipHeaderFieldName(RFC3261.HDR_FROM));
 //        String requestFromTag =
 //            requestFrom.getParam(new SipHeaderParamName(RFC3261.PARAM_TAG));
 //        dialog.setLocalTag(requestFromTag);
-        
+
         //remote tag
-        
+
         //already done in createDialog()
 //        dialog.setRemoteTag(toTag);
-        
-          //remote uri
-        
+
+        //remote uri
+
         SipHeaderFieldValue to = headers.get(new SipHeaderFieldName(RFC3261.HDR_TO));
         if (to != null) {
             String remoteUri = to.getValue();
@@ -217,27 +212,27 @@ public abstract class DialogMethodHandler extends MethodHandler {
             }
             dialog.setRemoteUri(remoteUri);
         }
-        
-          //local uri
+
+        //local uri
         SipHeaderFieldValue requestFrom = requestSipHeaders.get(
-              new SipHeaderFieldName(RFC3261.HDR_FROM));
+                new SipHeaderFieldName(RFC3261.HDR_FROM));
         String localUri = requestFrom.getValue();
         if (localUri.indexOf(RFC3261.LEFT_ANGLE_BRACKET) > -1) {
             localUri = NameAddress.nameAddressToUri(localUri);
         }
         dialog.setLocalUri(localUri);
-        
+
         return dialog;
     }
 
     protected ArrayList<String> computeRouteSet(SipHeaders headers) {
         SipHeaderFieldValue recordRoute =
-            headers.get(new SipHeaderFieldName(RFC3261.HDR_RECORD_ROUTE));
+                headers.get(new SipHeaderFieldName(RFC3261.HDR_RECORD_ROUTE));
         ArrayList<String> routeSet = new ArrayList<String>();
         if (recordRoute != null) {
             if (recordRoute instanceof SipHeaderFieldMultiValue) {
                 List<SipHeaderFieldValue> values =
-                    ((SipHeaderFieldMultiValue)recordRoute).getValues();
+                        ((SipHeaderFieldMultiValue) recordRoute).getValues();
                 for (SipHeaderFieldValue value : values) {
                     //reverse order
                     routeSet.add(0, value.toString());
@@ -248,12 +243,12 @@ public abstract class DialogMethodHandler extends MethodHandler {
         }
         return routeSet;
     }
-    
+
     //TODO see if AckHandler is usable
     class AckTimerTask extends TimerTask {
 
         private String toUri;
-        
+
         public AckTimerTask(String toUri) {
             super();
             this.toUri = toUri;
@@ -275,7 +270,7 @@ public abstract class DialogMethodHandler extends MethodHandler {
                 dialogs.remove(dialog);
             }
         }
-        
+
     }
 
 

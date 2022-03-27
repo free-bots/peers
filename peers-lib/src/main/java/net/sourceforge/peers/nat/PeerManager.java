@@ -111,7 +111,6 @@ public class PeerManager extends Thread {
             //datagramSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
-            return;
         }
     }
 }

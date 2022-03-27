@@ -28,7 +28,7 @@ import java.util.List;
 public class DtmfFactory {
 
     public List<RtpPacket> createDtmfPackets(char digit) {
-        List<RtpPacket> packets = new ArrayList<RtpPacket>();
+        List<RtpPacket> packets = new ArrayList<>();
         byte[] data = new byte[4];
         // RFC4733
         if (digit == '*') {

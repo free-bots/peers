@@ -26,7 +26,7 @@ public abstract class DialogState extends AbstractState {
 
     protected Dialog dialog;
 
-    public DialogState(String id, Dialog dialog, Logger logger) {
+    protected DialogState(String id, Dialog dialog, Logger logger) {
         super(id, logger);
         this.dialog = dialog;
     }
@@ -36,5 +36,14 @@ public abstract class DialogState extends AbstractState {
     public void receivedOrSent300To699() {}
     //sent or received a BYE for RFC3261
     public void receivedOrSentBye() {}
-    
+
+
+    protected void throwIllegalStateException() {
+        logInvalidTransition(id);
+        throw new IllegalStateException();
+    }
+
+    protected void logInvalidTransition(String id) {
+        logger.error(id + " invalid transition");
+    }
 }

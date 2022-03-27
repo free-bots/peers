@@ -19,25 +19,24 @@
 
 package net.sourceforge.peers.sip.transport;
 
-import java.net.InetAddress;
-
 import net.sourceforge.peers.sip.RFC3261;
+
+import java.net.InetAddress;
+import java.util.Objects;
 
 public class SipTransportConnection {
 
     public static final int EMPTY_PORT = -1;
 
-    private InetAddress localInetAddress;
+    private final InetAddress localInetAddress;
     private int localPort = EMPTY_PORT;
 
-    private InetAddress remoteInetAddress;
+    private final InetAddress remoteInetAddress;
     private int remotePort = EMPTY_PORT;
 
-    private String transport;// UDP, TCP or SCTP
+    private final String transport;// UDP, TCP or SCTP
 
-    public SipTransportConnection(InetAddress localInetAddress,
-            int localPort, InetAddress remoteInetAddress, int remotePort,
-            String transport) {
+    public SipTransportConnection(InetAddress localInetAddress, int localPort, InetAddress remoteInetAddress, int remotePort, String transport) {
         this.localInetAddress = localInetAddress;
         this.localPort = localPort;
         this.remoteInetAddress = remoteInetAddress;
@@ -47,23 +46,26 @@ public class SipTransportConnection {
 
     @Override
     public boolean equals(Object obj) {
+        if (Objects.isNull(obj)) {
+            return false;
+        }
+
         if (obj.getClass() != SipTransportConnection.class) {
             return false;
         }
-        SipTransportConnection other = (SipTransportConnection)obj;
+        SipTransportConnection other = (SipTransportConnection) obj;
         if (!transport.equalsIgnoreCase(other.transport)) {
             return false;
         }
         if (RFC3261.TRANSPORT_UDP.equalsIgnoreCase(transport)) {
-            return localInetAddress.equals(other.localInetAddress) &&
-                localPort == other.localPort;
+            return localInetAddress.equals(other.localInetAddress) && localPort == other.localPort;
         }
         return false;
     }
-    
+
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         appendInetAddress(buf, localInetAddress);
         buf.append(':');
         appendPort(buf, localPort);
@@ -78,19 +80,19 @@ public class SipTransportConnection {
         return buf.toString();
     }
 
-    private void appendInetAddress(StringBuffer buf, InetAddress inetAddress) {
+    private void appendInetAddress(StringBuilder builder, InetAddress inetAddress) {
         if (inetAddress != null) {
-            buf.append(inetAddress.getHostAddress());
+            builder.append(inetAddress.getHostAddress());
         } else {
-            buf.append("-");
+            builder.append("-");
         }
     }
 
-    private void appendPort(StringBuffer buf, int port) {
+    private void appendPort(StringBuilder builder, int port) {
         if (port != EMPTY_PORT) {
-            buf.append(port);
+            builder.append(port);
         } else {
-            buf.append("-");
+            builder.append("-");
         }
     }
 
@@ -118,6 +120,5 @@ public class SipTransportConnection {
     public String getTransport() {
         return transport;
     }
-    
-    
+
 }

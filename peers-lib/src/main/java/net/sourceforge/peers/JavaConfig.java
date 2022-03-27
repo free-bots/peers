@@ -50,7 +50,7 @@ public class JavaConfig implements Config {
     public JavaConfig()
     {
         // Add default codecs
-        supportedCodecs = new ArrayList<Codec>();
+        supportedCodecs = new ArrayList<>();
 
         Codec codec = new Codec();
         codec.setPayloadType(RFC3551.PAYLOAD_TYPE_PCMA);
