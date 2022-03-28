@@ -69,4 +69,29 @@ public class Codec {
                 MediaManager.DEFAULT_CLOCK + "\r\n";
     }
 
+    public static Codec.Builder builder() {
+        return new Codec.Builder();
+    }
+
+    public static final class Builder {
+        private final Codec codec;
+
+        public Builder() {
+            this.codec = new Codec();
+        }
+
+        public Builder payloadType(int payloadType) {
+            this.codec.setPayloadType(payloadType);
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.codec.setName(name);
+            return this;
+        }
+
+        public Codec build() {
+            return this.codec;
+        }
+    }
 }
