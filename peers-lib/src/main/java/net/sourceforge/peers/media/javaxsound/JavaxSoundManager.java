@@ -19,6 +19,11 @@
 
 package net.sourceforge.peers.media.javaxsound;
 
+import net.sourceforge.peers.Logger;
+import net.sourceforge.peers.media.AbstractSoundManager;
+import net.sourceforge.peers.sip.Utils;
+
+import javax.sound.sampled.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -28,31 +33,20 @@ import java.security.PrivilegedAction;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.SourceDataLine;
-import javax.sound.sampled.TargetDataLine;
-
-import net.sourceforge.peers.Logger;
-import net.sourceforge.peers.media.AbstractSoundManager;
-import net.sourceforge.peers.sip.Utils;
-
 public class JavaxSoundManager extends AbstractSoundManager {
 
-    private AudioFormat audioFormat;
+    private final AudioFormat audioFormat;
     private TargetDataLine targetDataLine;
     private SourceDataLine sourceDataLine;
-    private Object sourceDataLineMutex;
-    private DataLine.Info targetInfo;
-    private DataLine.Info sourceInfo;
+    private final Object sourceDataLineMutex;
+    private final DataLine.Info targetInfo;
+    private final DataLine.Info sourceInfo;
     private FileOutputStream microphoneOutput;
     private FileOutputStream speakerInput;
-    private boolean mediaDebug;
-    private Logger logger;
+    private final boolean mediaDebug;
+    private final Logger logger;
     private String peersHome;
-    
+
     public JavaxSoundManager(boolean mediaDebug, Logger logger, String peersHome) {
         this.mediaDebug = mediaDebug;
         this.logger = logger;
@@ -72,21 +66,21 @@ public class JavaxSoundManager extends AbstractSoundManager {
         logger.debug("openAndStartLines");
         if (mediaDebug) {
             SimpleDateFormat simpleDateFormat =
-                new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+                    new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
             String date = simpleDateFormat.format(new Date());
-            StringBuffer buf = new StringBuffer();
-            buf.append(peersHome).append(File.separator);
-            buf.append(MEDIA_DIR).append(File.separator);
-            buf.append(date).append("_");
-            buf.append(audioFormat.getEncoding()).append("_");
-            buf.append(audioFormat.getSampleRate()).append("_");
-            buf.append(audioFormat.getSampleSizeInBits()).append("_");
-            buf.append(audioFormat.getChannels()).append("_");
-            buf.append(audioFormat.isBigEndian() ? "be" : "le");
+            StringBuilder builder = new StringBuilder();
+            builder.append(peersHome).append(File.separator);
+            builder.append(MEDIA_DIR).append(File.separator);
+            builder.append(date).append("_");
+            builder.append(audioFormat.getEncoding()).append("_");
+            builder.append(audioFormat.getSampleRate()).append("_");
+            builder.append(audioFormat.getSampleSizeInBits()).append("_");
+            builder.append(audioFormat.getChannels()).append("_");
+            builder.append(audioFormat.isBigEndian() ? "be" : "le");
             try {
-                microphoneOutput = new FileOutputStream(buf.toString()
+                microphoneOutput = new FileOutputStream(builder
                         + "_microphone.output");
-                speakerInput = new FileOutputStream(buf.toString()
+                speakerInput = new FileOutputStream(builder
                         + "_speaker.input");
             } catch (FileNotFoundException e) {
                 logger.error("cannot create file", e);
@@ -95,10 +89,7 @@ public class JavaxSoundManager extends AbstractSoundManager {
         }
         // AccessController.doPrivileged added for plugin compatibility
         AccessController.doPrivileged(
-            new PrivilegedAction<Void>() {
-
-                @Override
-                public Void run() {
+                (PrivilegedAction<Void>) () -> {
                     try {
                         targetDataLine = (TargetDataLine) AudioSystem.getLine(targetInfo);
                         targetDataLine.open(audioFormat);
@@ -124,8 +115,7 @@ public class JavaxSoundManager extends AbstractSoundManager {
                         sourceDataLine.start();
                     }
                     return null;
-                }
-        });
+                });
 
     }
 
@@ -149,24 +139,20 @@ public class JavaxSoundManager extends AbstractSoundManager {
             speakerInput = null;
         }
         // AccessController.doPrivileged added for plugin compatibility
-        AccessController.doPrivileged(new PrivilegedAction<Void>() {
-
-            @Override
-            public Void run() {
-                if (targetDataLine != null) {
-                    targetDataLine.close();
-                    targetDataLine = null;
-                }
-                synchronized (sourceDataLineMutex) {
-                    if (sourceDataLine != null) {
-                        sourceDataLine.drain();
-                        sourceDataLine.stop();
-                        sourceDataLine.close();
-                        sourceDataLine = null;
-                    }
-                }
-                return null;
+        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+            if (targetDataLine != null) {
+                targetDataLine.close();
+                targetDataLine = null;
             }
+            synchronized (sourceDataLineMutex) {
+                if (sourceDataLine != null) {
+                    sourceDataLine.drain();
+                    sourceDataLine.stop();
+                    sourceDataLine.close();
+                    sourceDataLine = null;
+                }
+            }
+            return null;
         });
     }
 

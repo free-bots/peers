@@ -39,9 +39,9 @@ public class TransportManager {
 
     public static final int SOCKET_TIMEOUT = RFC3261.TIMER_T1;
 
-    private static int NO_TTL = -1;
+    private static final int NO_TTL = -1;
 
-    private Logger logger;
+    private final Logger logger;
 
     //private UAS uas;
     private SipServerTransportUser sipServerTransportUser;
@@ -52,9 +52,9 @@ public class TransportManager {
     private final Hashtable<SipTransportConnection, MessageSender> messageSenders;
     private final Hashtable<SipTransportConnection, MessageReceiver> messageReceivers;
 
-    private TransactionManager transactionManager;
+    private final TransactionManager transactionManager;
 
-    private Config config;
+    private final Config config;
     private int sipPort;
 
     public TransportManager(TransactionManager transactionManager,
@@ -164,13 +164,13 @@ public class TransportManager {
         //18.2.2
         SipHeaderFieldValue topVia = Utils.getTopVia(sipResponse);
         String topViaValue = topVia.getValue();
-        StringBuffer buf = new StringBuffer(topViaValue);
+        StringBuilder builder = new StringBuilder(topViaValue);
         String hostport = null;
         int i = topViaValue.length() - 1;
         while (i > 0) {
-            char c = buf.charAt(i);
+            char c = builder.charAt(i);
             if (c == ' ' || c == '\t') {
-                hostport = buf.substring(i + 1);
+                hostport = builder.substring(i + 1);
                 break;
             }
             --i;
@@ -191,9 +191,9 @@ public class TransportManager {
         }
 
         String transport;
-        if (buf.indexOf(RFC3261.TRANSPORT_TCP) > -1) {
+        if (builder.indexOf(RFC3261.TRANSPORT_TCP) > -1) {
             transport = RFC3261.TRANSPORT_TCP;
-        } else if (buf.indexOf(RFC3261.TRANSPORT_UDP) > -1) {
+        } else if (builder.indexOf(RFC3261.TRANSPORT_UDP) > -1) {
             transport = RFC3261.TRANSPORT_UDP;
         } else {
             logger.error("no transport found in top via header," +
@@ -226,7 +226,7 @@ public class TransportManager {
         //actual sending
 
         //TODO manage maddr parameter in top via for multicast
-        if (buf.indexOf(RFC3261.TRANSPORT_TCP) > -1) {
+        if (builder.indexOf(RFC3261.TRANSPORT_TCP) > -1) {
 //            Socket socket = (Socket)factory.connections.get(connection);
 //            if (!socket.isClosed()) {
 //                try {

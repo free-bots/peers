@@ -27,14 +27,14 @@ import net.sourceforge.peers.sip.RFC3261;
 
 public class SipURI {
 
-    public final static int DEFAULT_PORT = -1;
+    public static final int DEFAULT_PORT = -1;
     
-    private String stringRepresentation;
+    private final String stringRepresentation;
     /**
      * telephone-subscriber and optional port are not managed
      */
     private String userinfo;
-    private String host;
+    private final String host;
     private int port = DEFAULT_PORT;
     /**
      * Use empty strings in value if the parameter has no value

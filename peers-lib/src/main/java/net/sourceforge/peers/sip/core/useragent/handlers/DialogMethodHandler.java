@@ -77,7 +77,7 @@ public abstract class DialogMethodHandler extends MethodHandler {
         //route set
         SipHeaderFieldValue recordRoute =
                 respHeaders.get(new SipHeaderFieldName(RFC3261.HDR_RECORD_ROUTE));
-        ArrayList<String> routeSet = new ArrayList<String>();
+        ArrayList<String> routeSet = new ArrayList<>();
         if (recordRoute != null) {
             if (recordRoute instanceof SipHeaderFieldMultiValue) {
                 SipHeaderFieldMultiValue multiRecordRoute =
@@ -228,7 +228,7 @@ public abstract class DialogMethodHandler extends MethodHandler {
     protected ArrayList<String> computeRouteSet(SipHeaders headers) {
         SipHeaderFieldValue recordRoute =
                 headers.get(new SipHeaderFieldName(RFC3261.HDR_RECORD_ROUTE));
-        ArrayList<String> routeSet = new ArrayList<String>();
+        ArrayList<String> routeSet = new ArrayList<>();
         if (recordRoute != null) {
             if (recordRoute instanceof SipHeaderFieldMultiValue) {
                 List<SipHeaderFieldValue> values =
@@ -247,7 +247,7 @@ public abstract class DialogMethodHandler extends MethodHandler {
     //TODO see if AckHandler is usable
     class AckTimerTask extends TimerTask {
 
-        private String toUri;
+        private final String toUri;
 
         public AckTimerTask(String toUri) {
             super();
@@ -256,7 +256,7 @@ public abstract class DialogMethodHandler extends MethodHandler {
 
         @Override
         public void run() {
-            ArrayList<Dialog> purgedDialogs = new ArrayList<Dialog>();
+            ArrayList<Dialog> purgedDialogs = new ArrayList<>();
             Collection<Dialog> dialogs = dialogManager.getDialogCollection();
             for (Dialog dialog : dialogs) {
                 String remoteUri = dialog.getRemoteUri();

@@ -54,32 +54,32 @@ public class UserAgent implements DtmfEventHandler {
     public static final String CONFIG_FILE = "conf" + File.separator + "peers.xml";
     public static final int RTP_DEFAULT_PORT = 8000;
 
-    private String peersHome;
-    private Logger logger;
-    private Config config;
+    private final String peersHome;
+    private final Logger logger;
+    private final Config config;
 
-    private List<String> peers;
+    private final List<String> peers;
     //private List<Dialog> dialogs;
     
     //TODO factorize echo and captureRtpSender
     private Echo echo;
     
-    private UAC uac;
-    private UAS uas;
+    private final UAC uac;
+    private final UAS uas;
 
-    private ChallengeManager challengeManager;
+    private final ChallengeManager challengeManager;
     
-    private DialogManager dialogManager;
-    private TransactionManager transactionManager;
-    private TransportManager transportManager;
-    private InviteHandler inviteHandler;
+    private final DialogManager dialogManager;
+    private final TransactionManager transactionManager;
+    private final TransportManager transportManager;
+    private final InviteHandler inviteHandler;
 
     private int cseqCounter;
     private AbstractSoundManagerFactory abstractSoundManagerFactory;
-    private SipListener sipListener;
+    private final SipListener sipListener;
     
-    private SDPManager sdpManager;
-    private MediaManager mediaManager;
+    private final SDPManager sdpManager;
+    private final MediaManager mediaManager;
 
     public UserAgent(SipListener sipListener, String peersHome, Logger logger)
                     throws SocketException {
@@ -221,7 +221,7 @@ public class UserAgent implements DtmfEventHandler {
         inviteHandler.setChallengeManager(challengeManager);
         byeHandler.setChallengeManager(challengeManager);
 
-        peers = new ArrayList<String>();
+        peers = new ArrayList<>();
         //dialogs = new ArrayList<Dialog>();
 
         sdpManager = new SDPManager(this, logger);
@@ -314,11 +314,9 @@ public class UserAgent implements DtmfEventHandler {
 //    }
 
     public String generateCSeq(String method) {
-        StringBuffer buf = new StringBuffer();
-        buf.append(cseqCounter++);
-        buf.append(' ');
-        buf.append(method);
-        return buf.toString();
+        return String.valueOf(cseqCounter++) +
+                ' ' +
+                method;
     }
     
     public boolean isRegistered() {

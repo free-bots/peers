@@ -108,10 +108,8 @@ public class TransactionManagerTestNG {
                 "\r\n";
         SipResponse sipResponse = (SipResponse)parse(response);
         ServerTransactionUser serverTransactionUser =
-            new ServerTransactionUser() {
-                public void transactionFailure() {
-                }
-            };
+                () -> {
+                };
         DatagramSocket datagramSocket = new DatagramSocket();
         int port = datagramSocket.getLocalPort();
         datagramSocket.close();
@@ -173,10 +171,8 @@ public class TransactionManagerTestNG {
                 "\r\n";
         SipResponse sipResponse = (SipResponse)parse(response);
         ServerTransactionUser serverTransactionUser =
-            new ServerTransactionUser() {
-                public void transactionFailure() {
-                }
-            };
+                () -> {
+                };
         DatagramSocket datagramSocket = new DatagramSocket();
         int port = datagramSocket.getLocalPort();
         datagramSocket.close();

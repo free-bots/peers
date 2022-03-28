@@ -39,7 +39,6 @@ public class UdpMessageReceiverTestMain implements Runnable {
             transportManager.createServerTransport("UDP", RFC3261.TRANSPORT_DEFAULT_PORT);
         } catch (IOException e) {
             e.printStackTrace();
-            return;
         }
     }
     

@@ -48,7 +48,7 @@ public class XmlConfigTestNG {
         boolean mediaDebug = true;
         int rtpPort = 8002;
         String authorizationUsername = "authUser";
-        List<Codec> supportedCodecs = new ArrayList<Codec>();
+        List<Codec> supportedCodecs = new ArrayList<>();
         Codec codec = new Codec();
         codec.setName("testCodec1");
         codec.setPayloadType(128);

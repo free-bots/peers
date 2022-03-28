@@ -26,7 +26,7 @@ import net.sourceforge.peers.sip.RFC3261;
 
 public class SipHeadersTable {
     
-    private HashMap<Character, String> headers;
+    private final HashMap<Character, String> headers;
     
     /**
      * should be instanciated only once, it was a singleton.

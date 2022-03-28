@@ -35,17 +35,17 @@ public class MediaManager {
 
     public static final int DEFAULT_CLOCK = 8000; // Hz
 
-    private UserAgent userAgent;
-    private Object connectedSync = new Object();
+    private final UserAgent userAgent;
+    private final Object connectedSync = new Object();
     private CaptureRtpSender captureRtpSender;
     private IncomingRtpReader incomingRtpReader;
     private RtpSession rtpSession;
-    private DtmfFactory dtmfFactory;
-    private Logger logger;
+    private final DtmfFactory dtmfFactory;
+    private final Logger logger;
     private DatagramSocket datagramSocket;
 
     private AbstractSoundManager soundManager;
-    private DtmfEventHandler dtmfEventHandler;
+    private final DtmfEventHandler dtmfEventHandler;
 
     public MediaManager(UserAgent userAgent, DtmfEventHandler dtmfEventHandler,  Logger logger) {
         this.userAgent = userAgent;
@@ -325,7 +325,6 @@ public class MediaManager {
                 }
             }
         }
-        return;
 
     }
 

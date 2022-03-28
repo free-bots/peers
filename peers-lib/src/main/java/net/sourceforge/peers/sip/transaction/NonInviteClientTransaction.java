@@ -52,8 +52,8 @@ public class NonInviteClientTransaction extends NonInviteTransaction
     private NonInviteClientTransactionState state;
     //private SipClientTransport sipClientTransport;
     private MessageSender messageSender;
-    private int remotePort;
-    private InetAddress remoteInetAddress;
+    private final int remotePort;
+    private final InetAddress remoteInetAddress;
     
     NonInviteClientTransaction(String branchId, InetAddress inetAddress,
             int port, String transport, SipRequest sipRequest,

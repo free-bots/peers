@@ -19,27 +19,23 @@
 
 package net.sourceforge.peers.media;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-
 import net.sourceforge.peers.Logger;
+
+import java.io.IOException;
+import java.net.*;
 
 public class Echo implements Runnable {
 
     public static final int BUFFER_SIZE = 2048;
 
-    private DatagramSocket datagramSocket;
-    private InetAddress remoteAddress;
-    private int remotePort;
+    private final DatagramSocket datagramSocket;
+    private final InetAddress remoteAddress;
+    private final int remotePort;
     private boolean isRunning;
-    private Logger logger;
+    private final Logger logger;
 
     public Echo(DatagramSocket datagramSocket,
-            String remoteAddress, int remotePort, Logger logger)
+                String remoteAddress, int remotePort, Logger logger)
             throws UnknownHostException {
         this.datagramSocket = datagramSocket;
         this.remoteAddress = InetAddress.getByName(remoteAddress);

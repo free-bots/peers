@@ -19,37 +19,30 @@
 
 package net.sourceforge.peers.nat;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.*;
 
 public class Server {
 
     public static final String SERVER_HOST = "peers.sourceforge.net";
     public static final String PREFIX = "/peers";
     //public static final int SOCKET_TIMEOUT = 30000;//millis
-    
+
     //private InetAddress localAddress;
     //private int localPort;
-    private InetAddress remoteAddress;
-    private int remotePort;
-    
-    private Socket socket;
-    
+    private final InetAddress remoteAddress;
+    private final int remotePort;
+
+    private final Socket socket;
+
     //TODO constructor without parameters
     public Server(InetAddress localAddress, int localPort) throws IOException {
         super();
@@ -63,6 +56,7 @@ public class Server {
 
     /**
      * This method will update public address on the web server.
+     *
      * @param email user identifier
      */
     public void update(String email) {
@@ -73,13 +67,12 @@ public class Server {
             e.printStackTrace();
             return;
         }
-        StringBuffer urlEnd = new StringBuffer();
-        urlEnd.append("update2.php?email=");
-        urlEnd.append(encodedEmail);
-        get(urlEnd.toString());
+        String urlEnd = "update2.php?email=" +
+                encodedEmail;
+        get(urlEnd);
         close();
     }
-    
+
     public Document getPeers(String email) {
         String encodedEmail;
         try {
@@ -88,22 +81,22 @@ public class Server {
             e.printStackTrace();
             return null;
         }
-        StringBuffer urlBuf = new StringBuffer();
-        urlBuf.append("http://");
-        urlBuf.append(SERVER_HOST);
-        urlBuf.append(PREFIX);
-        urlBuf.append("/getassocasxml.php?email=");
-        urlBuf.append(encodedEmail);
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append("http://");
+        urlBuilder.append(SERVER_HOST);
+        urlBuilder.append(PREFIX);
+        urlBuilder.append("/getassocasxml.php?email=");
+        urlBuilder.append(encodedEmail);
         URL url;
         try {
-            url = new URL(urlBuf.toString());
+            url = new URL(urlBuilder.toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return null;
         }
         System.out.println("retrieved peers");
         DocumentBuilderFactory documentBuilderFactory
-            = DocumentBuilderFactory.newInstance();
+                = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder;
         try {
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
@@ -122,9 +115,9 @@ public class Server {
         }
         return null;
     }
-    
+
     private String get(String urlEnd) {
-        StringBuffer get = new StringBuffer();
+        StringBuilder get = new StringBuilder();
         get.append("GET ");
         get.append(PREFIX);
         get.append('/');
@@ -134,19 +127,19 @@ public class Server {
         get.append(SERVER_HOST);
         get.append("\r\n");
         get.append("\r\n");
-        
+
         try {
             socket.getOutputStream().write(get.toString().getBytes());
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
-        System.out.println("> sent:\n" + get.toString());
-        
-        StringBuffer result = new StringBuffer();
+        System.out.println("> sent:\n" + get);
+
+        StringBuilder result = new StringBuilder();
         try {
             byte[] buf = new byte[256];
-            int read = 0;
+            int read;
             while ((read = socket.getInputStream().read(buf)) > -1) {
                 byte[] exactBuf = new byte[read];
                 System.arraycopy(buf, 0, exactBuf, 0, read);
@@ -159,10 +152,10 @@ public class Server {
             e.printStackTrace();
             return null;
         }
-        System.out.println("< received:\n" + result.toString());
+        System.out.println("< received:\n" + result);
         return result.toString();
     }
-    
+
     public void close() {
         if (socket != null) {
             try {

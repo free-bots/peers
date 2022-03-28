@@ -36,9 +36,9 @@ public abstract class MessageSender {
     protected InetAddress inetAddress;
     protected int port;
     protected int localPort;
-    private Config config;
-    private String transportName;
-    private Timer timer;
+    private final Config config;
+    private final String transportName;
+    private final Timer timer;
     protected Logger logger;
 
     protected MessageSender(int localPort, InetAddress inetAddress,

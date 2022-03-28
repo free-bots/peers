@@ -64,7 +64,6 @@ public class UdpMessageSenderTestMain implements Runnable {
             messageSender.sendMessage(sipRequest);
         } catch (IOException e) {
             e.printStackTrace();
-            return;
         }
     }
     

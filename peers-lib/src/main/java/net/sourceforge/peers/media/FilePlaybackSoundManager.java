@@ -4,9 +4,9 @@ import net.sourceforge.peers.Logger;
 
 public class FilePlaybackSoundManager extends AbstractSoundManager {
 
-    private String fileName;
-    private DataFormat fileDataFormat;
-    private Logger logger;
+    private final String fileName;
+    private final DataFormat fileDataFormat;
+    private final Logger logger;
 
     private FileReader fileReader;
 

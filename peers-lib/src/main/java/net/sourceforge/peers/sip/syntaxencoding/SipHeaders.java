@@ -26,7 +26,7 @@ import java.util.ArrayList;
 
 public class SipHeaders {
 
-    private ArrayList<SipHeader> headers;
+    private final ArrayList<SipHeader> headers;
 
     public SipHeaders() {
         headers = new ArrayList<>();

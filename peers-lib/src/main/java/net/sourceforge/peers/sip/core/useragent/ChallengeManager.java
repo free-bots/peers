@@ -63,9 +63,9 @@ public class ChallengeManager implements MessageInterceptor {
     private int statusCode;
     private SipHeaderFieldValue contact;
 
-    private InitialRequestManager initialRequestManager;
-    private MidDialogRequestManager midDialogRequestManager;
-    private DialogManager dialogManager;
+    private final InitialRequestManager initialRequestManager;
+    private final MidDialogRequestManager midDialogRequestManager;
+    private final DialogManager dialogManager;
 
     public ChallengeManager(Config config,
                             InitialRequestManager initialRequestManager,

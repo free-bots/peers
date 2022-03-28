@@ -32,21 +32,21 @@ import net.sourceforge.peers.sdp.Codec;
 
 public class RtpSender implements Runnable {
 
-    private static int BUF_SIZE = Capture.BUFFER_SIZE / 2;
+    private static final int BUF_SIZE = Capture.BUFFER_SIZE / 2;
     public static int CONSUMING_BYTES_PER_MS = BUF_SIZE / 20; // Consuming BUF_SIZE bytes every 20 ms
 
-    private PipedInputStream encodedData;
-    private RtpSession rtpSession;
+    private final PipedInputStream encodedData;
+    private final RtpSession rtpSession;
     private boolean isStopped;
-    private Object pauseSync;
+    private final Object pauseSync;
     private boolean isPaused;
     private FileOutputStream rtpSenderInput;
-    private boolean mediaDebug;
-    private Codec codec;
-    private List<RtpPacket> pushedPackets;
-    private Logger logger;
-    private String peersHome;
-    private CountDownLatch latch;
+    private final boolean mediaDebug;
+    private final Codec codec;
+    private final List<RtpPacket> pushedPackets;
+    private final Logger logger;
+    private final String peersHome;
+    private final CountDownLatch latch;
     
     public RtpSender(PipedInputStream encodedData, RtpSession rtpSession,
             boolean mediaDebug, Codec codec, Logger logger, String peersHome,
@@ -62,7 +62,7 @@ public class RtpSender implements Runnable {
         pauseSync = new Object();
         isPaused = false;
         pushedPackets = Collections.synchronizedList(
-                new ArrayList<RtpPacket>());
+                new ArrayList<>());
     }
 
     public void run() {
@@ -99,7 +99,7 @@ public class RtpSender implements Runnable {
             int numBytesRead = 0;
             boolean currentlyReading = false;
             int tempBytesRead;
-            long sleepTime = 0;
+            long sleepTime;
             long lastSentTime = System.nanoTime();
             // indicate if its the first time that we send a packet (dont wait)
             boolean firstTime = true;

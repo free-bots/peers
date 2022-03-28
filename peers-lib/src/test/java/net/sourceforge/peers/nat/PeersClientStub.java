@@ -32,17 +32,13 @@ public class PeersClientStub extends PeersClient {
 
     @Override
     public TCPTransport createTCPTransport(String peerId) {
-        return new TCPTransport() {
-            public void sendData(byte[] data) {
-            }
+        return data -> {
         };
     }
 
     @Override
     public UDPTransport createUDPTransport(String peerId) {
-        return new UDPTransport() {
-            public void sendData(byte[] data) {
-            }
+        return data -> {
         };
     }
 

@@ -25,7 +25,7 @@ import java.net.DatagramSocket;
 
 public class UDPReceiver extends Thread {
 
-    private DatagramSocket datagramSocket;
+    private final DatagramSocket datagramSocket;
 
     public UDPReceiver(DatagramSocket datagramSocket) {
         super();

@@ -86,7 +86,7 @@ public class SdpParser {
 		sessionDescription.setName(line.substring(2));
 		
 		//session connection and attributes
-        Hashtable<String, String> sessionAttributes = new Hashtable<String, String>();
+        Hashtable<String, String> sessionAttributes = new Hashtable<>();
         sessionDescription.setAttributes(sessionAttributes);
 		
 		while ((line = reader.readLine()) != null
@@ -147,7 +147,7 @@ public class SdpParser {
                 //TODO manage port range
                 mediaDescription.setPort(Integer.parseInt(mediaArr[1]));
                 mediaDescription.setAttributes(new Hashtable<>());
-                List<Codec> codecs = new ArrayList<Codec>();
+                List<Codec> codecs = new ArrayList<>();
                 for (int i = 3; i < mediaArr.length; ++i) {
                     int payloadType = Integer.parseInt(mediaArr[i]);
                     Codec codec = new Codec();

@@ -213,7 +213,7 @@ public class InitialRequestManager extends RequestManager
             return;
         }
         
-        ClientTransaction clientTransaction = null;
+        ClientTransaction clientTransaction;
             clientTransaction = cancelHandler.preProcessCancel(sipRequest,
                     inviteRequest, midDialogRequestManager);
         if (clientTransaction != null) {

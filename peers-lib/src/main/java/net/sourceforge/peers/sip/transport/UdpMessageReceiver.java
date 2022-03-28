@@ -19,6 +19,11 @@
 
 package net.sourceforge.peers.sip.transport;
 
+import net.sourceforge.peers.Config;
+import net.sourceforge.peers.Logger;
+import net.sourceforge.peers.sip.RFC3261;
+import net.sourceforge.peers.sip.transaction.TransactionManager;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -27,20 +32,15 @@ import java.net.SocketTimeoutException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import net.sourceforge.peers.Config;
-import net.sourceforge.peers.Logger;
-import net.sourceforge.peers.sip.RFC3261;
-import net.sourceforge.peers.sip.transaction.TransactionManager;
-
 
 public class UdpMessageReceiver extends MessageReceiver {
 
-    private DatagramSocket datagramSocket;
-    
+    private final DatagramSocket datagramSocket;
+
     public UdpMessageReceiver(DatagramSocket datagramSocket,
-            TransactionManager transactionManager,
-            TransportManager transportManager, Config config,
-            Logger logger)
+                              TransactionManager transactionManager,
+                              TransportManager transportManager, Config config,
+                              Logger logger)
             throws SocketException {
         super(datagramSocket.getLocalPort(), transactionManager,
                 transportManager, config, logger);
@@ -56,14 +56,13 @@ public class UdpMessageReceiver extends MessageReceiver {
         final int ioException = 2;
         // AccessController.doPrivileged added for plugin compatibility
         int result = AccessController.doPrivileged(
-            new PrivilegedAction<Integer>() {
-                public Integer run() {
+                (PrivilegedAction<Integer>) () -> {
                     try {
                         datagramSocket.receive(packet);
                     } catch (SocketTimeoutException e) {
                         return socketTimeoutException;
-                    } catch(SocketException e) {
-                        if (e.getMessage().equals("Socket closed") && ! isListening()) // race condition
+                    } catch (SocketException e) {
+                        if (e.getMessage().equals("Socket closed") && !isListening()) // race condition
                             return noException;
                         else
                             return ioException;
@@ -72,17 +71,16 @@ public class UdpMessageReceiver extends MessageReceiver {
                         return ioException;
                     }
                     return noException;
-                }
-            });
+                });
         switch (result) {
-        case socketTimeoutException:
-            return;
-        case ioException:
-            throw new IOException();
-        case noException:
-            break;
-        default:
-            break;
+            case socketTimeoutException:
+                return;
+            case ioException:
+                throw new IOException();
+            case noException:
+                break;
+            default:
+                break;
         }
         byte[] trimmedPacket = new byte[packet.getLength()];
         System.arraycopy(packet.getData(), 0,

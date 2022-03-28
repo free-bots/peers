@@ -19,15 +19,14 @@
 
 package net.sourceforge.peers.rtp;
 
+import net.sourceforge.peers.Logger;
+import net.sourceforge.peers.media.AbstractSoundManager;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
+import java.net.*;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.SimpleDateFormat;
@@ -38,34 +37,31 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 
-import net.sourceforge.peers.Logger;
-import net.sourceforge.peers.media.AbstractSoundManager;
-
 /**
- * can be instantiated on UAC INVITE sending or on UAS 200 OK sending 
+ * can be instantiated on UAC INVITE sending or on UAS 200 OK sending
  */
 public class RtpSession {
 
     private InetAddress remoteAddress;
     private int remotePort;
-    private DatagramSocket datagramSocket;
+    private final DatagramSocket datagramSocket;
     private int executorServiceThreadNo = 0;
-    private ExecutorService executorService;
-    private List<RtpListener> rtpListeners;
-    private RtpParser rtpParser;
+    private final ExecutorService executorService;
+    private final List<RtpListener> rtpListeners;
+    private final RtpParser rtpParser;
     private FileOutputStream rtpSessionOutput;
     private FileOutputStream rtpSessionInput;
-    private boolean mediaDebug;
-    private Logger logger;
-    private String peersHome;
+    private final boolean mediaDebug;
+    private final Logger logger;
+    private final String peersHome;
 
     public RtpSession(InetAddress localAddress, DatagramSocket datagramSocket,
-            boolean mediaDebug, Logger logger, String peersHome) {
+                      boolean mediaDebug, Logger logger, String peersHome) {
         this.mediaDebug = mediaDebug;
         this.logger = logger;
         this.peersHome = peersHome;
         this.datagramSocket = datagramSocket;
-        rtpListeners = new ArrayList<RtpListener>();
+        rtpListeners = new ArrayList<>();
         rtpParser = new RtpParser(logger);
         executorService = Executors.newSingleThreadExecutor((runnable) -> new Thread(runnable, RtpSession.class.getSimpleName() + "-" + ++executorServiceThreadNo));
     }
@@ -73,7 +69,7 @@ public class RtpSession {
     public synchronized void start() {
         if (mediaDebug) {
             SimpleDateFormat simpleDateFormat =
-                new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+                    new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
             String date = simpleDateFormat.format(new Date());
             String dir = peersHome + File.separator
                     + AbstractSoundManager.MEDIA_DIR + File.separator;
@@ -93,12 +89,10 @@ public class RtpSession {
     public void stop() {
         // AccessController.doPrivileged added for plugin compatibility
         AccessController.doPrivileged(
-            new PrivilegedAction<Void>() {
-                public Void run() {
+                (PrivilegedAction<Void>) () -> {
                     executorService.shutdown();
                     return null;
                 }
-            }
         );
     }
 
@@ -113,15 +107,12 @@ public class RtpSession {
         byte[] buf = rtpParser.encode(rtpPacket);
         final DatagramPacket datagramPacket =
                 new DatagramPacket(buf, buf.length,
-                remoteAddress, remotePort);
-        
+                        remoteAddress, remotePort);
+
         if (!datagramSocket.isClosed()) {
             // AccessController.doPrivileged added for plugin compatibility
             AccessController.doPrivileged(
-                new PrivilegedAction<Void>() {
-
-                    @Override
-                    public Void run() {
+                    (PrivilegedAction<Void>) () -> {
                         try {
                             datagramSocket.send(datagramPacket);
                         } catch (IOException e) {
@@ -131,7 +122,6 @@ public class RtpSession {
                         }
                         return null;
                     }
-                }
             );
 
             if (mediaDebug) {
@@ -163,13 +153,10 @@ public class RtpSession {
         }
         // AccessController.doPrivileged added for plugin compatibility
         AccessController.doPrivileged(
-            new PrivilegedAction<Void>() {
-                @Override
-                public Void run() {
+                (PrivilegedAction<Void>) () -> {
                     datagramSocket.close();
                     return null;
                 }
-            }
         );
 
     }
@@ -193,33 +180,31 @@ public class RtpSession {
             final int socketTimeoutException = 1;
             final int ioException = 2;
             int result = AccessController.doPrivileged(
-	            new PrivilegedAction<Integer>() {
-	                public Integer run() {
-					    try {
-					        datagramSocket.receive(datagramPacket);
-					    } catch (SocketTimeoutException e) {
+                    (PrivilegedAction<Integer>) () -> {
+                        try {
+                            datagramSocket.receive(datagramPacket);
+                        } catch (SocketTimeoutException e) {
                             return socketTimeoutException;
-					    } catch (IOException e) {
-					        logger.error("cannot receive packet", e);
-					        return ioException;
-					    }
-					    return noException;
-	                }
-	            });
+                        } catch (IOException e) {
+                            logger.error("cannot receive packet", e);
+                            return ioException;
+                        }
+                        return noException;
+                    });
             switch (result) {
-            case socketTimeoutException:
-                try {
-                    executorService.execute(this);
-                } catch (RejectedExecutionException rej) {
-                    closeFileAndDatagramSocket();
-                }
-                return;
-            case ioException:
-                return;
-            case noException:
-                break;
-            default:
-                break;
+                case socketTimeoutException:
+                    try {
+                        executorService.execute(this);
+                    } catch (RejectedExecutionException rej) {
+                        closeFileAndDatagramSocket();
+                    }
+                    return;
+                case ioException:
+                    return;
+                case noException:
+                    break;
+                default:
+                    break;
             }
             InetAddress remoteAddress = datagramPacket.getAddress();
             if (remoteAddress != null &&
@@ -244,7 +229,7 @@ public class RtpSession {
                 }
             }
             RtpPacket rtpPacket = rtpParser.decode(trimmedData);
-            for (RtpListener rtpListener: rtpListeners) {
+            for (RtpListener rtpListener : rtpListeners) {
                 rtpListener.receivedRtpPacket(rtpPacket);
             }
             try {

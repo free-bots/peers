@@ -51,7 +51,7 @@ public class Dialog {
     private String remoteTarget;
     private boolean secure;
     private ArrayList<String> routeSet;
-    private Logger logger;
+    private final Logger logger;
 
     Dialog(String callId, String localTag, String remoteTag, Logger logger) {
         super();
@@ -140,7 +140,7 @@ public class Dialog {
 
         if (!routeSet.isEmpty()) {
             if (routeSet.get(0).contains(RFC3261.LOOSE_ROUTING)) {
-                ArrayList<SipHeaderFieldValue> routes = new ArrayList<SipHeaderFieldValue>();
+                ArrayList<SipHeaderFieldValue> routes = new ArrayList<>();
                 for (String route : routeSet) {
                     routes.add(new SipHeaderFieldValue(route));
                 }

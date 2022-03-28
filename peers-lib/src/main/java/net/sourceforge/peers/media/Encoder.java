@@ -19,34 +19,29 @@
 
 package net.sourceforge.peers.media;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import net.sourceforge.peers.Logger;
+
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 
-import net.sourceforge.peers.Logger;
-
 
 public abstract class Encoder implements Runnable {
-    
-    private PipedInputStream rawData;
-    private PipedOutputStream encodedData;
+
+    private final PipedInputStream rawData;
+    private final PipedOutputStream encodedData;
     private boolean isStopped;
     private FileOutputStream encoderOutput;
     private FileOutputStream encoderInput;
-    private boolean mediaDebug;
-    private Logger logger;
-    private String peersHome;
-    private CountDownLatch latch;
+    private final boolean mediaDebug;
+    private final Logger logger;
+    private final String peersHome;
+    private final CountDownLatch latch;
 
     protected Encoder(PipedInputStream rawData, PipedOutputStream encodedData,
-            boolean mediaDebug, Logger logger, String peersHome,
-            CountDownLatch latch) {
+                      boolean mediaDebug, Logger logger, String peersHome,
+                      CountDownLatch latch) {
         this.rawData = rawData;
         this.encodedData = encodedData;
         this.mediaDebug = mediaDebug;
@@ -55,7 +50,7 @@ public abstract class Encoder implements Runnable {
         this.latch = latch;
         isStopped = false;
     }
-    
+
     public void run() {
         try {
             int buf_size = Capture.BUFFER_SIZE;

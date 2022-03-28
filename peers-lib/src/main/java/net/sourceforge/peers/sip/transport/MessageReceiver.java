@@ -47,9 +47,9 @@ public abstract class MessageReceiver implements Runnable {
     
     //private UAS uas;
     private SipServerTransportUser sipServerTransportUser;
-    private TransactionManager transactionManager;
-    private TransportManager transportManager;
-    private Config config;
+    private final TransactionManager transactionManager;
+    private final TransportManager transportManager;
+    private final Config config;
     protected Logger logger;
 
     protected MessageReceiver(int port, TransactionManager transactionManager,
@@ -156,7 +156,7 @@ public abstract class MessageReceiver implements Runnable {
             SipHeaderParamName rportName = new SipHeaderParamName(
                     RFC3261.PARAM_RPORT);
             String rport = topVia.getParam(rportName);
-            if (rport != null && "".equals(rport)) {
+            if ("".equals(rport)) {
                 topVia.removeParam(rportName);
                 topVia.addParam(rportName, String.valueOf(sourcePort));
             }

@@ -32,11 +32,11 @@ public class Capture implements Runnable {
     public static final int SAMPLE_SIZE = 16;
     public static final int BUFFER_SIZE = SAMPLE_SIZE * 20;
     
-    private PipedOutputStream rawData;
+    private final PipedOutputStream rawData;
     private boolean isStopped;
-    private SoundSource soundSource;
-    private Logger logger;
-    private CountDownLatch latch;
+    private final SoundSource soundSource;
+    private final Logger logger;
+    private final CountDownLatch latch;
     
     public Capture(PipedOutputStream rawData, SoundSource soundSource,
             Logger logger, CountDownLatch latch) {

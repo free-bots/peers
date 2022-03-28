@@ -187,10 +187,8 @@ public class XmlConfig implements Config {
         if (!isNullOrEmpty(mediaFileNode)) {
             mediaFile = mediaFileNode.getTextContent();
         }
-        if (mediaMode == MediaMode.file) {
-            if (mediaFile == null || "".equals(mediaFile.trim())) {
-                logger.error("streaming from file but no file provided");
-            }
+        if (mediaMode == MediaMode.file && (mediaFile == null || "".equals(mediaFile.trim()))) {
+            logger.error("streaming from file but no file provided");
         }
         rtpPortNode = getFirstChild(documentElement, "rtpPort");
         if (isNullOrEmpty(rtpPortNode)) {

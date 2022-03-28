@@ -25,10 +25,10 @@ public interface SoundSource {
         LINEAR_PCM_8KHZ_16BITS_SIGNED_MONO_LITTLE_ENDIAN("pcm_8khz_16_bits_mono", "Linear PCM, 8kHz, 16-bites signed, mono-channel, little endian"),
         ALAW_8KHZ_MONO_LITTLE_ENDIAN("a_law", "A-law, 8kHz, mono-channel, little endian");
 
-        private String shortAlias;
-        private String description;
+        private final String shortAlias;
+        private final String description;
 
-        public static DataFormat DEFAULT = LINEAR_PCM_8KHZ_16BITS_SIGNED_MONO_LITTLE_ENDIAN;
+        public static final DataFormat DEFAULT = LINEAR_PCM_8KHZ_16BITS_SIGNED_MONO_LITTLE_ENDIAN;
 
         DataFormat(String shortAlias, String description) {
             this.shortAlias = shortAlias;

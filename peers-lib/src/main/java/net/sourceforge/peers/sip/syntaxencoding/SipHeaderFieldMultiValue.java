@@ -23,7 +23,7 @@ import java.util.List;
 
 public class SipHeaderFieldMultiValue extends SipHeaderFieldValue {
 
-    private List<SipHeaderFieldValue> values;
+    private final List<SipHeaderFieldValue> values;
     
     private static String toString(List<SipHeaderFieldValue> list) {
         if (list == null) {

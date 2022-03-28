@@ -19,23 +19,23 @@
 
 package net.sourceforge.peers.nat;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 public class PeerManager extends Thread {
 
-    private InetAddress localAddress;
-    private int localPort;
+    private final InetAddress localAddress;
+    private final int localPort;
     private Document document;
-    
+
     public PeerManager(InetAddress localAddress, int localPort) {
         this.localAddress = localAddress;
         this.localPort = localPort;
@@ -45,6 +45,7 @@ public class PeerManager extends Thread {
         this.document = document;
     }
 
+    @Override
     public void run() {
         DatagramSocket datagramSocket;
         try {
@@ -72,7 +73,7 @@ public class PeerManager extends Thread {
             }
         }
     }
-    
+
     private void createConnection(Node peer, DatagramSocket datagramSocket) {
         NodeList childNodes = peer.getChildNodes();
         String ipAddress = null;
@@ -97,7 +98,7 @@ public class PeerManager extends Thread {
                 String message = "hello world " + System.currentTimeMillis();
                 byte[] buf = message.getBytes();
                 DatagramPacket datagramPacket =
-                    new DatagramPacket(buf, buf.length, remoteAddress, remotePort);
+                        new DatagramPacket(buf, buf.length, remoteAddress, remotePort);
                 datagramSocket.send(datagramPacket);
                 System.out.println("> sent:\n" + message);
                 try {

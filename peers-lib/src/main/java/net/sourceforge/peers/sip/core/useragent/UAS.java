@@ -46,10 +46,10 @@ public class UAS implements SipServerTransportUser {
         SUPPORTED_METHODS.add(RFC3261.METHOD_BYE);
     }
 
-    private InitialRequestManager initialRequestManager;
-    private MidDialogRequestManager midDialogRequestManager;
+    private final InitialRequestManager initialRequestManager;
+    private final MidDialogRequestManager midDialogRequestManager;
 
-    private DialogManager dialogManager;
+    private final DialogManager dialogManager;
 
     /**
      * should be instanciated only once, it was a singleton.

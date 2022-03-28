@@ -21,7 +21,7 @@ package net.sourceforge.peers.sip.syntaxencoding;
 
 public class SipHeaderParamName {
 
-    private String name;
+    private final String name;
     
     public SipHeaderParamName(String name) {
         this.name = name;
@@ -38,10 +38,7 @@ public class SipHeaderParamName {
             return false;
         }
         String objName = ((SipHeaderParamName)obj).getName();
-        if (name.equalsIgnoreCase(objName)) {
-            return true;
-        }
-        return false;
+        return name.equalsIgnoreCase(objName);
     }
     
     @Override

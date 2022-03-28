@@ -26,7 +26,7 @@ public class PcmuDecoder extends Decoder {
 //    private final static int SEG_SHIFT = 4;
 //    private final static int SEG_MASK = 0x70;
 //    private final static int SIGN_BIT = 0x80;
-    private static short[] muLawDecompressTable = new short[]{
+    private static final short[] muLawDecompressTable = new short[]{
         -32124, -31100, -30076, -29052, -28028, -27004, -25980, -24956,
         -23932, -22908, -21884, -20860, -19836, -18812, -17788, -16764,
         -15996, -15484, -14972, -14460, -13948, -13436, -12924, -12412,

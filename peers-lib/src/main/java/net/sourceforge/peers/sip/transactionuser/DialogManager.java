@@ -35,7 +35,7 @@ import net.sourceforge.peers.sip.transport.SipResponse;
 public class DialogManager {
     
     private final Hashtable<String, Dialog> dialogs;
-    private Logger logger;
+    private final Logger logger;
     
     public DialogManager(Logger logger) {
         this.logger = logger;

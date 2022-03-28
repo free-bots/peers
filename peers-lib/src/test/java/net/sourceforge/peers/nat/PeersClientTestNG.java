@@ -34,12 +34,8 @@ public class PeersClientTestNG {
     
     @BeforeClass
     public void init() {
-        peersClient = new PeersClientStub("alice@atlanta.com", new DataReceiver() {
-            public void dataReceived(byte[] data, String peerId) {
-                Reporter.log("received bytes from " + peerId + ": "
-                                        + new String(data));
-            }
-        });
+        peersClient = new PeersClientStub("alice@atlanta.com", (data, peerId) -> Reporter.log("received bytes from " + peerId + ": "
+                                + new String(data)));
     }
 
     @Test

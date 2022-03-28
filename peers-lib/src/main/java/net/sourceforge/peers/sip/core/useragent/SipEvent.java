@@ -24,11 +24,11 @@ import net.sourceforge.peers.sip.transport.SipMessage;
 public class SipEvent {
 
     public enum EventType {
-        ERROR, RINGING, INCOMING_CALL, CALLEE_PICKUP;
+        ERROR, RINGING, INCOMING_CALL, CALLEE_PICKUP
     }
 
-    private EventType eventType;
-    private SipMessage sipMessage;
+    private final EventType eventType;
+    private final SipMessage sipMessage;
 
     public SipEvent(EventType type, SipMessage sipMessage) {
         this.eventType = type;

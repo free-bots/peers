@@ -19,29 +19,25 @@
 
 package net.sourceforge.peers;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import net.sourceforge.peers.sip.Utils;
+
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import net.sourceforge.peers.sip.Utils;
 
 public class FileLogger implements Logger {
 
     public static final String LOG_FILE = File.separator + "logs"
-        + File.separator + "peers.log";
+            + File.separator + "peers.log";
     public static final String NETWORK_FILE = File.separator + "logs"
-        + File.separator + "transport.log";
+            + File.separator + "transport.log";
 
     private PrintWriter logWriter;
     private PrintWriter networkWriter;
-    private Object logMutex;
-    private Object networkMutex;
-    private SimpleDateFormat logFormatter;
-    private SimpleDateFormat networkFormatter;
+    private final Object logMutex;
+    private final Object networkMutex;
+    private final SimpleDateFormat logFormatter;
+    private final SimpleDateFormat networkFormatter;
 
     public FileLogger(String peersHome) {
         if (peersHome == null) {
@@ -95,18 +91,16 @@ public class FileLogger implements Logger {
             logWriter.flush();
         }
     }
-    
-    private final String genericLog(String message, String level) {
-        StringBuffer buf = new StringBuffer();
-        buf.append(logFormatter.format(new Date()));
-        buf.append(" ");
-        buf.append(level);
-        buf.append(" [");
-        buf.append(Thread.currentThread().getName());
-        buf.append("] ");
-        buf.append(message);
-        buf.append("\n");
-        return buf.toString();
+
+    private String genericLog(String message, String level) {
+        return logFormatter.format(new Date()) +
+                " " +
+                level +
+                " [" +
+                Thread.currentThread().getName() +
+                "] " +
+                message +
+                "\n";
     }
 
     @Override

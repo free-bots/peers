@@ -57,7 +57,7 @@ public class InviteHandler extends DialogMethodHandler
     public static final int TIMEOUT = 100;
 
     private MediaDestination mediaDestination;
-    private Timer ackTimer;
+    private final Timer ackTimer;
     private boolean initialIncomingInvite;
 
     public InviteHandler(UserAgent userAgent,
@@ -417,9 +417,7 @@ public class InviteHandler extends DialogMethodHandler
         }
         List<String> guiClosedCallIds = userAgent.getUac().getGuiClosedCallIds();
         String callId = Utils.getMessageCallId(sipResponse);
-        if (guiClosedCallIds.contains(callId)) {
-            guiClosedCallIds.remove(callId);
-        }
+        guiClosedCallIds.remove(callId);
         userAgent.getMediaManager().setDatagramSocket(null);
     }
 

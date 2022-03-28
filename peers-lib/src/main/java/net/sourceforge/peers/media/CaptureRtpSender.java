@@ -35,7 +35,7 @@ public class CaptureRtpSender {
 
     public static final int PIPE_SIZE = 16384;
 
-    private RtpSession rtpSession;
+    private final RtpSession rtpSession;
     private Capture capture;
     private Encoder encoder;
     private RtpSender rtpSender;

@@ -43,11 +43,11 @@ public class TransactionManager {
 
     // TODO remove client transactions when they reach terminated state
     // TODO check that server transactions are removed in all transitions to terminated
-    private Hashtable<String, ClientTransaction> clientTransactions;
-    private Hashtable<String, ServerTransaction> serverTransactions;
+    private final Hashtable<String, ClientTransaction> clientTransactions;
+    private final Hashtable<String, ServerTransaction> serverTransactions;
 
     private TransportManager transportManager;
-    private Logger logger;
+    private final Logger logger;
     
     public TransactionManager(Logger logger) {
         this.logger = logger;

@@ -34,7 +34,7 @@ import java.security.PrivilegedAction;
 
 public class UdpMessageSender extends MessageSender {
 
-    private DatagramSocket datagramSocket;
+    private final DatagramSocket datagramSocket;
 
     public UdpMessageSender(InetAddress inetAddress, int port,
                             DatagramSocket datagramSocket, Config config,

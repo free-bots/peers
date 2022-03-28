@@ -5,7 +5,7 @@ import net.sourceforge.peers.media.AbstractSoundManagerFactory;
 
 public class DummyAbstractSoundManagerFactory implements AbstractSoundManagerFactory {
 
-    private DummySoundManager soundManager = new DummySoundManager();
+    private final DummySoundManager soundManager = new DummySoundManager();
 
     @Override
     public AbstractSoundManager getSoundManager() {

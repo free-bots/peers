@@ -19,17 +19,13 @@
 
 package net.sourceforge.peers.sip.transaction;
 
+import net.sourceforge.peers.Logger;
+import net.sourceforge.peers.Timer;
+import net.sourceforge.peers.sip.RFC3261;
+import net.sourceforge.peers.sip.transport.*;
+
 import java.io.IOException;
 import java.util.TimerTask;
-
-import net.sourceforge.peers.Timer;
-import net.sourceforge.peers.Logger;
-import net.sourceforge.peers.sip.RFC3261;
-import net.sourceforge.peers.sip.transport.SipMessage;
-import net.sourceforge.peers.sip.transport.SipRequest;
-import net.sourceforge.peers.sip.transport.SipResponse;
-import net.sourceforge.peers.sip.transport.SipServerTransportUser;
-import net.sourceforge.peers.sip.transport.TransportManager;
 
 
 public class InviteServerTransaction extends InviteTransaction
@@ -40,21 +36,21 @@ public class InviteServerTransaction extends InviteTransaction
     public final InviteServerTransactionState COMPLETED;
     public final InviteServerTransactionState CONFIRMED;
     public final InviteServerTransactionState TERMINATED;
-    
+
     protected String transport;
     protected int nbRetrans;
     protected ServerTransactionUser serverTransactionUser;
-    
+
     private InviteServerTransactionState state;
     //private SipServerTransport sipServerTransport;
-    private int port;
-    
+    private final int port;
+
     InviteServerTransaction(String branchId, int port, String transport,
-            SipResponse sipResponse, ServerTransactionUser serverTransactionUser,
-            SipRequest sipRequest, Timer timer, TransactionManager transactionManager,
-            TransportManager transportManager, Logger logger) {
+                            SipResponse sipResponse, ServerTransactionUser serverTransactionUser,
+                            SipRequest sipRequest, Timer timer, TransactionManager transactionManager,
+                            TransportManager transportManager, Logger logger) {
         super(branchId, timer, transportManager, transactionManager, logger);
-        
+
         INIT = new InviteServerTransactionStateInit(getId(), this, logger);
         state = INIT;
         PROCEEDING = new InviteServerTransactionStateProceeding(getId(), this,
@@ -65,7 +61,7 @@ public class InviteServerTransaction extends InviteTransaction
                 logger);
         TERMINATED = new InviteServerTransactionStateTerminated(getId(), this,
                 logger);
-        
+
         this.request = sipRequest;
         this.port = port;
         this.transport = transport;
@@ -77,7 +73,7 @@ public class InviteServerTransaction extends InviteTransaction
 
     public void start() {
         state.start();
-        
+
 //        sipServerTransport = SipTransportFactory.getInstance()
 //            .createServerTransport(this, port, transport);
         try {
@@ -86,7 +82,7 @@ public class InviteServerTransaction extends InviteTransaction
             logger.error("input/output error", e);
         }
     }
-    
+
     public void receivedRequest(SipRequest sipRequest) {
         String method = sipRequest.getMethod();
         if (RFC3261.METHOD_INVITE.equals(method)) {
@@ -96,7 +92,7 @@ public class InviteServerTransaction extends InviteTransaction
             // in the case the call was not successful
             state.receivedAck();
         }
-        
+
     }
 
     public void sendResponse(SipResponse sipResponse) {
@@ -126,9 +122,9 @@ public class InviteServerTransaction extends InviteTransaction
 
     public void messageReceived(SipMessage sipMessage) {
         // TODO Auto-generated method stub
-        
+
     }
-    
+
     void sendLastResponse() {
         //sipServerTransport.sendResponse(responses.get(responses.size() - 1));
         int nbOfResponses = responses.size();
@@ -140,7 +136,7 @@ public class InviteServerTransaction extends InviteTransaction
             }
         }
     }
-    
+
     public SipResponse getLastResponse() {
         int nbOfResponses = responses.size();
         if (nbOfResponses > 0) {
@@ -148,7 +144,7 @@ public class InviteServerTransaction extends InviteTransaction
         }
         return null;
     }
-    
+
     // TODO send provional response
     /*
      * maybe the 200 response mechanism could be retrieved for 1xx responses.
@@ -157,26 +153,26 @@ public class InviteServerTransaction extends InviteTransaction
 // void stopSipServerTransport() {
 //        sipServerTransport.stop();
 //    }
-    
+
     class TimerG extends TimerTask {
         @Override
         public void run() {
             state.timerGFires();
         }
     }
-    
+
     class TimerH extends TimerTask {
         @Override
         public void run() {
             state.timerHFiresOrTransportError();
         }
     }
-    
+
     class TimerI extends TimerTask {
         @Override
         public void run() {
             state.timerIFires();
         }
     }
-    
+
 }

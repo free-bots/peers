@@ -6,9 +6,9 @@ import net.sourceforge.peers.media.javaxsound.JavaxSoundManager;
 
 public class ConfigAbstractSoundManagerFactory implements AbstractSoundManagerFactory {
 
-    private Config config;
-    private String peersHome;
-    private Logger logger;
+    private final Config config;
+    private final String peersHome;
+    private final Logger logger;
 
     public ConfigAbstractSoundManagerFactory(Config config, String peersHome, Logger logger) {
         this.config = config;

@@ -254,7 +254,7 @@ public class RegisterHandler extends MethodHandler
                 }
                 timer = new Timer(getClass().getSimpleName()
                         + " refresh timer");
-                timer.schedule(new RefreshTimerTask(), delay * 1000);
+                timer.schedule(new RefreshTimerTask(), delay * 1000L);
             }
         }
         SipListener sipListener = userAgent.getSipListener();

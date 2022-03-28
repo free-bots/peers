@@ -24,7 +24,7 @@ public class SipHeaderFieldName {
     private final static SipHeadersTable SIP_HEADER_TABLE =
         new SipHeadersTable();
 
-    private String name;
+    private final String name;
 
     public SipHeaderFieldName(String name) {
         super();
@@ -41,10 +41,7 @@ public class SipHeaderFieldName {
             return false;
         }
         String objName = ((SipHeaderFieldName)obj).getName();
-        if (name.equalsIgnoreCase(objName)) {
-            return true;
-        }
-        return false;
+        return name.equalsIgnoreCase(objName);
     }
 
     @Override

@@ -71,11 +71,9 @@ public abstract class RequestManager {
         SipHeaderFieldValue toValue = requestHeaders.get(toName);
         SipHeaderParamName toTagParamName = new SipHeaderParamName(RFC3261.PARAM_TAG);
         String toTag = toValue.getParam(toTagParamName);
-        if (toTag == null) {
-            if (dialog != null) {
-                toTag = dialog.getLocalTag();
-                toValue.addParam(toTagParamName, toTag);
-            }
+        if (toTag == null && dialog != null) {
+            toTag = dialog.getLocalTag();
+            toValue.addParam(toTagParamName, toTag);
         }
         responseHeaders.add(toName, toValue);
         return sipResponse;

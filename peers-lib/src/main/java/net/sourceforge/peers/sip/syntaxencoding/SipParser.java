@@ -19,6 +19,11 @@
 
 package net.sourceforge.peers.sip.syntaxencoding;
 
+import net.sourceforge.peers.sip.RFC3261;
+import net.sourceforge.peers.sip.transport.SipMessage;
+import net.sourceforge.peers.sip.transport.SipRequest;
+import net.sourceforge.peers.sip.transport.SipResponse;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,22 +31,17 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.peers.sip.RFC3261;
-import net.sourceforge.peers.sip.transport.SipMessage;
-import net.sourceforge.peers.sip.transport.SipRequest;
-import net.sourceforge.peers.sip.transport.SipResponse;
-
 
 public class SipParser {
 
     private BufferedReader reader;
-    
-    private final static int BUFF_SIZE = 1024;
-    
-    private List<SipHeaderFieldName> singleValueHeaders;
+
+    private static final int BUFF_SIZE = 1024;
+
+    private final List<SipHeaderFieldName> singleValueHeaders;
 
     public SipParser() {
-        singleValueHeaders = new ArrayList<SipHeaderFieldName>();
+        singleValueHeaders = new ArrayList<>();
         singleValueHeaders.add(new SipHeaderFieldName(
                 RFC3261.HDR_WWW_AUTHENTICATE));
         singleValueHeaders.add(new SipHeaderFieldName(
@@ -58,10 +58,10 @@ public class SipParser {
 
     public synchronized SipMessage parse(InputStream in)
             throws IOException, SipParserException {
-        
+
         InputStreamReader inputStreamReader = new InputStreamReader(in);
         reader = new BufferedReader(inputStreamReader);
-        
+
         String startLine = reader.readLine();
         while (startLine == null || startLine.equals("")) {
             startLine = reader.readLine();
@@ -69,21 +69,20 @@ public class SipParser {
         SipMessage sipMessage;
         if (startLine.toUpperCase().startsWith(RFC3261.DEFAULT_SIP_VERSION)) {
             sipMessage = parseSipResponse(startLine);
-        }
-        else {
+        } else {
             sipMessage = parseSipRequest(startLine);
         }
         parseHeaders(sipMessage);
         parseBody(sipMessage);
         return sipMessage;
     }
-    
+
     private SipRequest parseSipRequest(String startLine) throws SipParserException {
         String[] params = startLine.split(" ");
         if (params.length != 3) {
             throw new SipParserException("invalid request line");
         }
-        if (!RFC3261.DEFAULT_SIP_VERSION.equals(params[2].toUpperCase())) {
+        if (!RFC3261.DEFAULT_SIP_VERSION.equalsIgnoreCase(params[2])) {
             throw new SipParserException("unsupported SIP version");
         }
         SipURI requestUri;
@@ -94,23 +93,23 @@ public class SipParser {
         }
         return new SipRequest(params[0], requestUri);
     }
-    
+
     private SipResponse parseSipResponse(String startLine) throws SipParserException {
         String[] params = startLine.split(" ");
         if (params.length < 3) {
             throw new SipParserException("incorrect status line");
         }
-        if (!RFC3261.DEFAULT_SIP_VERSION.equals(params[0].toUpperCase())) {
+        if (!RFC3261.DEFAULT_SIP_VERSION.equalsIgnoreCase(params[0])) {
             throw new SipParserException("unsupported SIP version");
         }
-        StringBuffer buf = new StringBuffer();
+        StringBuilder builder = new StringBuilder();
         for (int i = 2; i < params.length; ++i) {
-            buf.append(params[i]).append(" ");
+            builder.append(params[i]).append(" ");
         }
-        buf.deleteCharAt(buf.length() - 1);
-        return new SipResponse(Integer.parseInt(params[1]), buf.toString());
+        builder.deleteCharAt(builder.length() - 1);
+        return new SipResponse(Integer.parseInt(params[1]), builder.toString());
     }
-    
+
     private void parseHeaders(SipMessage sipMessage) throws IOException, SipParserException {
         SipHeaders sipHeaders = new SipHeaders();
         String headerLine = reader.readLine();
@@ -121,14 +120,14 @@ public class SipParser {
             String nextLine = reader.readLine();
             if (nextLine != null &&
                     (nextLine.startsWith(" ") || nextLine.startsWith("\t"))) {
-                StringBuffer buf = new StringBuffer(headerLine);
+                StringBuilder builder = new StringBuilder(headerLine);
                 while (nextLine != null &&
                         (nextLine.startsWith(" ") || nextLine.startsWith("\t"))) {
-                    buf.append(' ');
-                    buf.append(nextLine.trim());
+                    builder.append(' ');
+                    builder.append(nextLine.trim());
                     nextLine = reader.readLine();
                 }
-                headerLine = buf.toString();
+                headerLine = builder.toString();
             }
             if (headerLine == null) {
                 throw new SipParserException(sipMessage.toString());
@@ -142,11 +141,11 @@ public class SipParser {
             String value = headerLine.substring(columnPos + 1).trim();
             SipHeaderFieldValue sipHeaderValue;
             if (!singleValueHeaders.contains(sipHeaderName) &&
-                    value.indexOf(RFC3261.HEADER_SEPARATOR) > -1) {
+                    value.contains(RFC3261.HEADER_SEPARATOR)) {
                 String[] values = value.split(RFC3261.HEADER_SEPARATOR);
                 List<SipHeaderFieldValue> list =
-                    new ArrayList<SipHeaderFieldValue>();
-                for (String s: values) {
+                        new ArrayList<>();
+                for (String s : values) {
                     list.add(new SipHeaderFieldValue(s));
                 }
                 sipHeaderValue = new SipHeaderFieldMultiValue(list);
@@ -158,11 +157,11 @@ public class SipParser {
         }
         sipMessage.setSipHeaders(sipHeaders);
     }
-    
+
     public void parseBody(SipMessage sipMessage) throws IOException, SipParserException {
         SipHeaderFieldValue contentLengthValue =
-            sipMessage.getSipHeaders().get(new SipHeaderFieldName(
-                    RFC3261.HDR_CONTENT_LENGTH));
+                sipMessage.getSipHeaders().get(new SipHeaderFieldName(
+                        RFC3261.HDR_CONTENT_LENGTH));
         if (contentLengthValue == null) {
             return;
         }
@@ -175,9 +174,9 @@ public class SipParser {
                 byte[] aux = new byte[buff.length + BUFF_SIZE];
                 System.arraycopy(buff, 0, aux, 0, buff.length);
                 buff = aux;
-                
+
             }
-            buff[count++] = (byte)i;
+            buff[count++] = (byte) i;
         }
         if (count != buff.length) {
             byte[] aux = new byte[count];

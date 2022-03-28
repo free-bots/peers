@@ -56,7 +56,7 @@ public class Utils {
         //TODO make a hash using current time millis, public ip @, private @, and a random string
         return randomString(8) +
                 '-' +
-                String.valueOf(System.currentTimeMillis()) +
+                System.currentTimeMillis() +
                 '@' +
                 inetAddress.getHostName();
     }

@@ -85,7 +85,7 @@ public class PcmaEncoder extends Encoder {
             sample = cClip;
         }
         if (sample >= 256) {
-            exponent = (int) aLawCompressTable[(sample >> 8) & 0x7F];
+            exponent = aLawCompressTable[(sample >> 8) & 0x7F];
             mantissa = (sample >> (exponent + 3)) & 0x0F;
             s = (exponent << 4) | mantissa;
         } else {

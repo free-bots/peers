@@ -19,47 +19,47 @@
 
 package net.sourceforge.peers.media;
 
-import java.io.IOException;
-
 import net.sourceforge.peers.Logger;
 import net.sourceforge.peers.rtp.*;
 import net.sourceforge.peers.sdp.Codec;
 
+import java.io.IOException;
+
 public class IncomingRtpReader implements RtpListener {
 
-    private RtpSession rtpSession;
-    private AbstractSoundManager soundManager;
-    private Decoder decoder;
-    private DtmfDecoder dtmfDecoder;
+    private final RtpSession rtpSession;
+    private final AbstractSoundManager soundManager;
+    private final Decoder decoder;
+    private final DtmfDecoder dtmfDecoder;
 
 
     public IncomingRtpReader(RtpSession rtpSession,
-            AbstractSoundManager soundManager, Codec codec, DtmfEventHandler dtmfHandler, Logger logger)
+                             AbstractSoundManager soundManager, Codec codec, DtmfEventHandler dtmfHandler, Logger logger)
             throws IOException {
         logger.debug("playback codec:" + codec.toString().trim());
         this.rtpSession = rtpSession;
         this.soundManager = soundManager;
         switch (codec.getPayloadType()) {
-        case RFC3551.PAYLOAD_TYPE_PCMU:
-            decoder = new PcmuDecoder();
-            break;
-        case RFC3551.PAYLOAD_TYPE_PCMA:
-            decoder = new PcmaDecoder();
-            break;
-        default:
-            throw new RuntimeException("unsupported payload type");
+            case RFC3551.PAYLOAD_TYPE_PCMU:
+                decoder = new PcmuDecoder();
+                break;
+            case RFC3551.PAYLOAD_TYPE_PCMA:
+                decoder = new PcmaDecoder();
+                break;
+            default:
+                throw new RuntimeException("unsupported payload type");
         }
         dtmfDecoder = new DtmfDecoder(dtmfHandler);
         rtpSession.addRtpListener(this);
     }
-    
+
     public void start() {
         rtpSession.start();
     }
 
     @Override
     public void receivedRtpPacket(RtpPacket rtpPacket) {
-        if(rtpPacket.getPayloadType() == RFC4733.PAYLOAD_TYPE_TELEPHONE_EVENT) {
+        if (rtpPacket.getPayloadType() == RFC4733.PAYLOAD_TYPE_TELEPHONE_EVENT) {
             dtmfDecoder.processPacket(rtpPacket);
         } else {
             byte[] rawBuf = decoder.process(rtpPacket.getData());

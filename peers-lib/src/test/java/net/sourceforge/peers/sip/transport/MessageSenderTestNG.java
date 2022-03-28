@@ -57,9 +57,7 @@ public class MessageSenderTestNG {
         config.setSipPort(localPort);
         config.setLocalInetAddress(InetAddress.getLocalHost());
         SipServerTransportUser sipServerTransportUser =
-            new SipServerTransportUser() {
-            @Override public void messageReceived(SipMessage sipMessage) {}
-        };
+                sipMessage -> {};
         Logger logger = new FileLogger(null);
         transportManager = new TransportManager(
                 new TransactionManager(logger),
@@ -70,27 +68,25 @@ public class MessageSenderTestNG {
     
     @Test(groups = "listen")
     public void listen() throws InterruptedException {
-        Thread thread = new Thread(new Runnable() {
-            public void run() {
-                DatagramPacket datagramPacket = new DatagramPacket(
-                        new byte[2048], 2048);
-                DatagramSocket datagramSocket;
-                try {
-                    datagramSocket = new DatagramSocket();
-                    port = datagramSocket.getLocalPort();
-                    while (message == null || "".equals(message.trim())) {
-                        datagramSocket.receive(datagramPacket);
-                        byte[] receivedBytes = datagramPacket.getData();
-                        int nbReceivedBytes = datagramPacket.getLength();
-                        byte[] trimmedBytes = new byte[nbReceivedBytes];
-                        System.arraycopy(receivedBytes, 0,
-                                trimmedBytes, 0, nbReceivedBytes);
-                        message = new String(trimmedBytes);
-                    }
-                    messageReceived = true;
-                } catch (IOException e) {
-                    e.printStackTrace();
+        Thread thread = new Thread(() -> {
+            DatagramPacket datagramPacket = new DatagramPacket(
+                    new byte[2048], 2048);
+            DatagramSocket datagramSocket;
+            try {
+                datagramSocket = new DatagramSocket();
+                port = datagramSocket.getLocalPort();
+                while (message == null || "".equals(message.trim())) {
+                    datagramSocket.receive(datagramPacket);
+                    byte[] receivedBytes = datagramPacket.getData();
+                    int nbReceivedBytes = datagramPacket.getLength();
+                    byte[] trimmedBytes = new byte[nbReceivedBytes];
+                    System.arraycopy(receivedBytes, 0,
+                            trimmedBytes, 0, nbReceivedBytes);
+                    message = new String(trimmedBytes);
                 }
+                messageReceived = true;
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
         thread.start();

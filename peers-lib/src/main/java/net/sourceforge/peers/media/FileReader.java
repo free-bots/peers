@@ -18,11 +18,11 @@
 */
 package net.sourceforge.peers.media;
 
+import net.sourceforge.peers.Logger;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
-import net.sourceforge.peers.Logger;
 
 // To create an audio file for peers, you can use audacity:
 //
@@ -47,12 +47,12 @@ import net.sourceforge.peers.Logger;
 
 public class FileReader implements SoundSource {
 
-    public final static int BUFFER_SIZE = 256;
+    public static final int BUFFER_SIZE = 256;
 
-    private Object finishedSync = new Object();
+    private final Object finishedSync = new Object();
     private FileInputStream fileInputStream;
-    private DataFormat fileDataFormat;
-    private Logger logger;
+    private final DataFormat fileDataFormat;
+    private final Logger logger;
 
     public FileReader(String fileName, DataFormat fileDataFormat, Logger logger) {
         this.logger = logger;
@@ -80,7 +80,7 @@ public class FileReader implements SoundSource {
 
     @Override
     public DataFormat dataProduced() {
-        return (fileDataFormat != null)?fileDataFormat:DataFormat.DEFAULT;
+        return (fileDataFormat != null) ? fileDataFormat : DataFormat.DEFAULT;
     }
 
     @Override
@@ -93,7 +93,8 @@ public class FileReader implements SoundSource {
             int read;
             if ((read = fileInputStream.read(buffer)) >= 0) {
                 // TODO There is a problem if not the entire buffer was filled. That is not communicated to the reader of the returned byte-array
-                if (read < buffer.length) System.out.println("Buffer was not completely filled, but we are sending it all through anyway");
+                if (read < buffer.length)
+                    System.out.println("Buffer was not completely filled, but we are sending it all through anyway");
                 return buffer;
             } else {
                 close();
@@ -118,6 +119,5 @@ public class FileReader implements SoundSource {
                 }
             }
         }
-        return;
     }
 }
